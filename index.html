@@ -7,27 +7,42 @@
 <meta name="description" content="Shih. Dëgjo. Mbrohu.">
 <script>document.documentElement.className += ' js';</script>
 <style>
-/* ------------------------------------------------------------------
-   Base
------------------------------------------------------------------- */
+/* ==================================================================
+   System
+   One ground that brightens as the story moves: spotlights in the dark
+   (museum) → one lamp (phone) → open daylight (umbrellas).
+   One accent: amber light. One mark per installation: square, circle, dome.
+================================================================== */
 :root {
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --serif: Georgia, "Times New Roman", Times, serif;
-  --ease-out: cubic-bezier(.2, .8, .2, 1);
-  --ease-spring: cubic-bezier(.3, 1.35, .5, 1);
+
+  --ink: #0c0c0d;
+  --ink-2: #131315;
+  --ink-3: #1a1b1e;
+  --graphite: #232428;
+  --bone: #ece6da;
+  --bone-2: #d6cfc1;
+  --paper: #f1ede6;
+  --stone: #8f8a82;
+  --amber: #e6a84a;
+  --light: 255, 238, 206;
+
+  --ease: cubic-bezier(.2, .7, .1, 1);
+  --ease-io: cubic-bezier(.6, 0, .2, 1);
 }
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; background: var(--ink); }
 body {
   margin: 0;
   font-family: var(--sans);
-  background: #0e0f12;
-  color: #f3efe6;
+  color: var(--bone);
+  background: var(--ink);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 4px; }
 .sr-only {
   position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
@@ -43,33 +58,87 @@ button { font: inherit; color: inherit; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 72px 16px 64px;
+  padding: 76px 16px 72px;
 }
-.wrap { position: relative; width: 100%; max-width: 1100px; margin: 0 auto; }
+.wrap { position: relative; width: 100%; max-width: 1120px; margin: 0 auto; }
 
-.eyebrow {
-  margin: 0 0 18px;
-  font: 700 .74rem/1.2 var(--sans);
+/* The three marks */
+.glyph { display: inline-block; flex: none; width: 11px; height: 11px; border: 1.5px solid currentColor; }
+.g-sq { border-radius: 1px; }
+.g-ci { border-radius: 50%; }
+.g-dome { height: 6px; width: 12px; border-radius: 12px 12px 0 0; }
+
+/* Section header: identical in all three rooms */
+.sec-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin: 0 0 clamp(28px, 6vw, 56px);
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(236, 230, 218, .14);
+  font-size: .72rem;
+  font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
-  text-align: center;
-  opacity: .8;
 }
-.eyebrow .n { opacity: .55; margin-right: .6em; }
+.sec-head .sh-l { display: flex; align-items: center; gap: 12px; }
+.sec-head .sh-num { opacity: .5; font-variant-numeric: tabular-nums; }
+.sec-head h2 { margin: 0; font: inherit; }
+.sec-head .sh-word { color: var(--amber); letter-spacing: .12em; }
+.on-light .sec-head { border-bottom-color: rgba(12, 12, 13, .14); }
+.on-light .sec-head .sh-word { color: #9a6418; }
 
-/* Scroll-in reveal: hidden only when JS runs, shown once the scene is in view */
+/* One statement per room, same size and place */
+.statement {
+  margin: 0 auto clamp(40px, 7vw, 72px);
+  max-width: 22ch;
+  font-size: clamp(1.55rem, 4.8vw, 3.05rem);
+  line-height: 1.16;
+  letter-spacing: -.018em;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Scroll-in reveal (one easing for the whole page) */
 html.js .rv {
   opacity: 0;
-  transform: translateY(26px);
-  transition: opacity .9s var(--ease-out), transform .9s var(--ease-out);
-  transition-delay: calc(var(--d, 0) * 110ms);
+  transform: translateY(22px);
+  transition: opacity 1s var(--ease), transform 1.1s var(--ease);
+  transition-delay: calc(var(--d, 0) * 100ms);
 }
 html.js .in-view .rv { opacity: 1; transform: none; }
 
+/* Light cone: the intro, every museum exhibit and the phone share it */
+.beam {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: blur(8px);
+  pointer-events: none;
+  transition: opacity .8s var(--ease);
+}
+.beam.fade { -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 100%); mask-image: linear-gradient(180deg, #000 50%, transparent 100%); }
+.beam > span {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(var(--light), 0) 0%, rgba(var(--light), .07) 45%, rgba(var(--light), .22) 100%);
+  clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
+  opacity: 0;
+}
+html:not(.js) .beam > span { opacity: 1; }
+.in-view .beam > span { opacity: 1; animation: light-on 1.4s linear both; animation-delay: calc(var(--d, 0) * 140ms + 250ms); }
+@keyframes light-on {
+  0% { opacity: 0; } 8% { opacity: .6; } 12% { opacity: .08; } 20% { opacity: .8; }
+  25% { opacity: .2; } 40% { opacity: 1; } 100% { opacity: 1; }
+}
+
 /* ------------------------------------------------------------------
-   Progress dots
+   Progress marks
 ------------------------------------------------------------------ */
 .dots {
+  --fg: var(--bone);
   position: fixed;
   right: 4px;
   top: 50%;
@@ -78,149 +147,115 @@ html.js .in-view .rv { opacity: 1; transform: none; }
   display: flex;
   flex-direction: column;
   gap: 2px;
+  color: var(--fg);
+  transition: color .5s;
 }
+body[data-sec="cadrat"] .dots, body[data-sec="fundi"] .dots { --fg: var(--ink); }
 .dots a {
-  --accent: #f3e3bf;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 10px;
   min-height: 30px;
-  padding: 0 3px;
+  padding: 0 4px;
+  color: inherit;
   text-decoration: none;
-  color: #fff;
-  border-radius: 99px;
 }
-.dots a[data-sec="telefoni"] { --accent: #e3ae4d; }
-.dots a[data-sec="cadrat"] { --accent: #ff5d73; }
-.dot {
-  display: block;
-  width: 8px;
-  height: 8px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, .9);
-  box-shadow: 0 0 0 1.5px rgba(10, 12, 16, .55);
-  transition: height .4s var(--ease-out), background-color .4s;
-}
-.dots a[aria-current="true"] .dot { height: 24px; background: var(--accent); }
+.dots .glyph { width: 9px; height: 9px; opacity: .65; transition: background-color .4s, border-color .4s, opacity .4s, transform .4s var(--ease); }
+.dots .g-dome { width: 11px; height: 6px; }
+.dots a[aria-current="true"] .glyph { background: var(--amber); border-color: var(--amber); opacity: 1; transform: scale(1.25); }
 .dot-label {
-  font-size: .72rem;
+  font-size: .68rem;
   font-weight: 700;
-  letter-spacing: .02em;
-  background: rgba(14, 15, 18, .82);
-  color: #fff;
-  padding: 4px 9px;
-  border-radius: 99px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
   white-space: nowrap;
   opacity: 0;
   transform: translateX(6px);
-  transition: opacity .3s, transform .3s var(--ease-out);
+  transition: opacity .3s, transform .4s var(--ease);
   pointer-events: none;
 }
-.dots a:hover .dot-label,
-.dots a:focus-visible .dot-label,
-.dots a.flash .dot-label { opacity: 1; transform: none; }
-.dots a:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.dots a:hover .dot-label, .dots a:focus-visible .dot-label, .dots a.flash .dot-label { opacity: 1; transform: none; }
+.dots a:focus-visible { outline-offset: 0; }
+@media (max-width: 699px) {
+  .sec-head { font-size: .64rem; letter-spacing: .1em; gap: 6px 10px; }
+  .sec-head .sh-l { gap: 9px; }
+  .dot-label { padding: 4px 8px; border-radius: 99px; background: rgba(12, 12, 13, .86); color: var(--bone); }
+}
 
 /* ------------------------------------------------------------------
    0. Intro
 ------------------------------------------------------------------ */
-.intro {
-  text-align: center;
-  background:
-    radial-gradient(42% 36% at 22% 30%, rgba(243, 227, 191, .10), transparent 70%),
-    radial-gradient(40% 34% at 52% 72%, rgba(227, 174, 77, .10), transparent 70%),
-    radial-gradient(40% 36% at 82% 34%, rgba(255, 93, 115, .10), transparent 70%),
-    #0e0f12;
-}
+.intro { text-align: center; background: var(--ink); }
+.intro > .beam { top: 0; width: min(900px, 150vw); height: 92%; }
 .intro-title {
+  position: relative;
   margin: 0 auto;
   max-width: 11ch;
-  font-size: clamp(2.5rem, 11vw, 6.4rem);
+  font-size: clamp(2.5rem, 11vw, 6.6rem);
   font-weight: 800;
-  line-height: 1.02;
-  letter-spacing: -.035em;
+  line-height: 1;
+  letter-spacing: -.04em;
+  color: #f4efe6;
 }
 .intro-title .w { display: inline-block; }
 .intro-sub {
   display: flex;
   justify-content: center;
-  gap: clamp(22px, 7vw, 72px);
-  margin: 44px 0 0;
-  font-size: clamp(1.1rem, 4vw, 1.6rem);
-  font-weight: 650;
+  gap: clamp(28px, 8vw, 80px);
+  margin: 48px 0 0;
+  font-size: clamp(1rem, 3.6vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: .01em;
 }
-.motif { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.motif svg { width: clamp(40px, 10vw, 56px); height: auto; overflow: visible; }
-.m-see { color: #f3e3bf; }
-.m-hear { color: #e3ae4d; }
-.m-safe { color: #ff5d73; }
+.motif { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.motif .glyph { width: 16px; height: 16px; color: var(--amber); }
+.motif .g-dome { width: 18px; height: 9px; margin-top: 7px; }
 .hint {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: 0; right: 0;
   width: max-content;
   margin: 0 auto;
-  bottom: max(24px, env(safe-area-inset-bottom));
+  bottom: max(22px, env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  color: rgba(243, 239, 230, .72);
-  text-decoration: none;
-  font-size: .9rem;
-  letter-spacing: .04em;
+  gap: 12px;
   padding: 8px 12px;
-  border-radius: 12px;
+  color: rgba(236, 230, 218, .62);
+  text-decoration: none;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
 }
-.hint svg { width: 22px; height: 22px; animation: nudge 1.8s ease-in-out infinite; }
-@keyframes nudge {
-  0%, 100% { transform: translateY(0); opacity: .6; }
-  50% { transform: translateY(7px); opacity: 1; }
+.hint .line { position: relative; width: 1px; height: 36px; background: rgba(236, 230, 218, .18); overflow: hidden; }
+.hint .line::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 0;
+  width: 1px; height: 14px;
+  background: var(--amber);
+  animation: travel 2s var(--ease-io) infinite;
 }
+@keyframes travel { 0% { transform: translateY(-14px); } 100% { transform: translateY(36px); } }
 
 /* ------------------------------------------------------------------
    1. Muzeu
 ------------------------------------------------------------------ */
 .museum {
-  color: #efe7d6;
+  color: var(--bone);
   background:
-    radial-gradient(90% 55% at 50% 0%, #2d2922 0%, rgba(26, 24, 20, 0) 70%),
-    linear-gradient(180deg, #1b1915 0%, #151310 68%, #0c0b09 100%);
+    radial-gradient(80% 40% at 50% 0%, rgba(var(--light), .05), transparent 70%),
+    linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%);
 }
-.museum::before { /* wall texture: very faint vertical panels */
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .012) 0 1px, transparent 1px 140px);
-  pointer-events: none;
-}
-.museum::after { /* floor */
-  content: "";
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 18%;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .55));
-  border-top: 1px solid rgba(255, 240, 210, .04);
-  pointer-events: none;
-}
-.inscription {
-  margin: 0 auto 56px;
-  max-width: 24ch;
-  font-family: var(--serif);
-  font-size: clamp(1.5rem, 5vw, 3.1rem);
-  line-height: 1.22;
-  text-align: center;
-  color: #f2e9d5;
-  text-shadow: 0 0 34px rgba(255, 228, 178, .16);
-}
+.inscription { font-family: var(--serif); color: #f2ecdf; letter-spacing: 0; }
 .gallery {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 44px 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 40px 10px;
   width: 100%;
-  max-width: 1040px;
   margin: 0 auto;
 }
 .exhibit {
@@ -228,117 +263,94 @@ html.js .in-view .rv { opacity: 1; transform: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 0 6px;
+  padding: 0 0 4px;
   margin: 0;
   border: 0;
   background: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: opacity .7s var(--ease-out), filter .7s var(--ease-out);
+  transition: opacity .7s var(--ease), filter .7s var(--ease);
 }
-.exhibit:focus-visible { outline: 2px solid #f3e3bf; outline-offset: 8px; border-radius: 4px; }
-.objbox { position: relative; width: 74%; aspect-ratio: 4 / 3; }
-.beam {
-  position: absolute;
-  left: 50%;
-  bottom: -4px;
-  width: 190%;
-  height: 250%;
-  transform: translateX(-50%);
-  filter: blur(7px);
-  pointer-events: none;
-  transition: opacity .7s;
-}
-.beam > span {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255, 236, 200, 0) 0%, rgba(255, 236, 200, .09) 45%, rgba(255, 236, 200, .26) 100%);
-  clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
-  opacity: 0;
-}
+.exhibit:focus-visible { outline-offset: 8px; border-radius: 2px; }
+.objbox { position: relative; width: 82%; aspect-ratio: 4 / 3; }
+.objbox .beam { bottom: -4px; width: 170%; height: 165%; opacity: .85; }
 .pool {
   position: absolute;
   left: 50%;
-  bottom: -18%;
-  width: 150%;
-  height: 70%;
+  bottom: -16%;
+  width: 140%;
+  height: 60%;
   transform: translateX(-50%);
-  background: radial-gradient(50% 50% at 50% 70%, rgba(255, 232, 190, .20), transparent 70%);
+  background: radial-gradient(50% 50% at 50% 70%, rgba(var(--light), .16), transparent 70%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity .9s, transform .9s var(--ease-out);
+  transition: opacity .9s, transform .9s var(--ease);
 }
-html:not(.js) .beam > span, html:not(.js) .pool { opacity: 1; }
-.museum.in-view .beam > span { opacity: 1; animation: light-on 1.3s linear both; animation-delay: calc(var(--d, 0) * 260ms + 300ms); }
-.museum.in-view .pool { opacity: 1; transition-delay: calc(var(--d, 0) * 260ms + 500ms); }
-@keyframes light-on {
-  0% { opacity: 0; } 8% { opacity: .7; } 12% { opacity: .1; } 20% { opacity: .85; }
-  24% { opacity: .25; } 38% { opacity: 1; } 100% { opacity: 1; }
-}
+html:not(.js) .pool { opacity: 1; }
+.museum.in-view .pool { opacity: 1; transition-delay: calc(var(--d, 0) * 140ms + 450ms); }
 .obj {
   position: absolute;
   inset: 0;
   z-index: 2;
   transform-origin: 50% 100%;
-  transition: transform .75s var(--ease-out);
+  transition: transform .8s var(--ease);
 }
-.obj svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45)); }
-.exhibit.active .obj { transform: translateY(-14px) scale(1.42); }
-.exhibit.active .obj svg { animation: bob 3.4s ease-in-out .8s infinite; }
-@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
-@media (hover: hover) {
-  .exhibit:not(.active):hover .obj { transform: translateY(-5px); }
-}
+.obj svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .5)); }
+.exhibit.active .obj { transform: translateY(-12px) scale(1.55); }
+.exhibit.active .obj svg { animation: bob 3.6s ease-in-out .9s infinite; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@media (hover: hover) { .exhibit:not(.active):hover .obj { transform: translateY(-4px); } }
 .plinth {
   position: relative;
   z-index: 1;
-  width: 78%;
-  height: clamp(52px, 8.5vw, 96px);
+  width: 80%;
+  height: clamp(40px, 7vw, 82px);
   margin-top: 6px;
-  background: linear-gradient(90deg, #cfcac0 0%, #f7f5f0 30%, #f1eee7 62%, #c9c3b8 100%);
-  box-shadow: 0 22px 30px -14px rgba(0, 0, 0, .8);
+  background: linear-gradient(90deg, #cdc6b8 0%, #e9e3d7 22%, #ece6da 70%, #c9c1b2 100%);
 }
-.plinth::before { /* top face */
+.plinth::before {
   content: "";
   position: absolute;
-  left: 0; right: 0; top: -9px;
-  height: 9px;
-  background: linear-gradient(180deg, #fdfcf9, #e9e6df);
-  clip-path: polygon(5% 0, 95% 0, 100% 100%, 0 100%);
+  left: 0; right: 0; top: -7px;
+  height: 7px;
+  background: #f4f0e8;
+  clip-path: polygon(4% 0, 96% 0, 100% 100%, 0 100%);
 }
-.plinth::after { /* floor contact */
+.plinth::after {
   content: "";
   position: absolute;
-  left: -12%; right: -12%; bottom: -14px;
-  height: 20px;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, .65), transparent);
+  left: -14%; right: -14%; bottom: -12px;
+  height: 18px;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, .7), transparent);
 }
-.contact { /* object's shadow on the plinth top */
+.contact {
   position: absolute;
   left: 50%;
-  top: -10px;
-  width: 62%;
-  height: 10px;
+  top: -9px;
+  width: 60%;
+  height: 8px;
   transform: translateX(-50%);
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, .42), transparent);
-  transition: transform .75s var(--ease-out), opacity .75s;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, .4), transparent);
+  transition: transform .8s var(--ease), opacity .8s;
 }
-.exhibit.active .contact { transform: translateX(-50%) scale(.62); opacity: .5; }
+.exhibit.active .contact { transform: translateX(-50%) scale(.6); opacity: .5; }
 .tag {
-  margin-top: 22px;
-  padding: 5px 11px 6px;
-  font: 400 .82rem/1.2 var(--serif);
-  letter-spacing: .03em;
-  color: #1c1a16;
-  background: #ece6d8;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, .45);
+  max-width: 100%;
+  margin-top: 18px;
+  padding: 4px 8px 5px;
+  font: 400 .74rem/1.25 var(--serif);
+  letter-spacing: .02em;
+  color: var(--ink);
+  background: var(--bone);
+  text-align: center;
 }
-.gallery.has-active .exhibit:not(.active) { opacity: .18; filter: saturate(.4); }
+.gallery.has-active .exhibit:not(.active) { opacity: .14; filter: saturate(.3); }
 .exhibit.active { z-index: 3; }
 .exhibit.active .pool { transform: translateX(-50%) scale(1.25); }
 
-/* Full label */
+/* The label: one component for the museum, the phone and the umbrellas */
+.label { color: var(--ink); background: var(--bone); border-radius: 2px; }
 .museum-card {
   position: fixed;
   z-index: 50;
@@ -349,145 +361,122 @@ html:not(.js) .beam > span, html:not(.js) .pool { opacity: 1; }
   margin: 0 auto;
   padding: 20px 22px 18px;
   font-family: var(--serif);
-  color: #1c1a16;
-  background: #f2ede2;
-  border-radius: 2px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, .6), 0 0 0 1px rgba(0, 0, 0, .05);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, .6);
   transform: translateY(calc(100% + 40px));
   visibility: hidden;
-  transition: transform .6s var(--ease-out), visibility 0s linear .6s;
+  transition: transform .7s var(--ease), visibility 0s linear .7s;
 }
-.museum-card.show { transform: none; visibility: visible; transition: transform .6s var(--ease-out), visibility 0s; }
-.museum-card h3 { margin: 0 0 8px; font-size: 1.4rem; font-weight: 700; letter-spacing: .01em; }
+.museum-card.show { transform: none; visibility: visible; transition: transform .7s var(--ease), visibility 0s; }
+.mc-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.museum-card h3 { margin: 0; font-size: 1.38rem; font-weight: 700; letter-spacing: .005em; }
 .museum-card .mc-text { margin: 0; font-size: 1.02rem; line-height: 1.5; }
 .museum-card .mc-period {
   margin: 14px 0 0;
   padding-top: 10px;
-  border-top: 1px solid rgba(28, 26, 22, .18);
+  border-top: 1px solid rgba(12, 12, 13, .16);
   font-size: .92rem;
-  color: #5d554a;
+  color: #5b554c;
 }
+
+/* Cross-links between the rooms */
+.xref {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid currentColor;
+  border-radius: 99px;
+  background: transparent;
+  font: 700 .68rem/1 var(--sans);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color .25s, color .25s, border-color .25s;
+}
+.xref .glyph { width: 9px; height: 9px; }
+.xref .g-dome { width: 11px; height: 6px; }
+.xref[hidden] { display: none; }
+.xref .xn { font-variant-numeric: tabular-nums; opacity: .7; }
+.museum-card .xref { color: #6d4710; border-color: rgba(109, 71, 16, .45); }
+.museum-card .xref:hover { background: var(--ink); border-color: var(--ink); color: var(--bone); }
 
 /* ------------------------------------------------------------------
    2. Telefoni
 ------------------------------------------------------------------ */
 .phone-scene {
-  color: #2b2723;
-  background:
-    radial-gradient(80% 60% at 50% 40%, rgba(255, 248, 230, .16), transparent 70%),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, .035) 0 24px, rgba(0, 0, 0, .015) 24px 48px),
-    #7f9483;
+  color: var(--bone);
+  background: linear-gradient(180deg, var(--ink-2) 0%, var(--ink-3) 100%);
 }
-.phone-scene .eyebrow { color: #f1e8d3; }
 .phone-stage {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   width: 100%;
-  max-width: 980px;
+  max-width: 1000px;
   margin: 0 auto;
   align-items: start;
 }
 .rig-col { position: relative; z-index: 2; }
-.rig { position: relative; width: 280px; margin: 0 auto; }
+.rig { position: relative; width: 300px; max-width: 100%; margin: 0 auto; }
+.rig > .beam { top: -90px; width: 520px; height: 520px; --d: 1; }
 .pole {
   position: absolute;
   left: 50%;
-  top: 6px;
-  width: 18px;
+  top: 0;
+  width: 12px;
   height: 300vh;
   transform: translateX(-50%);
-  background: linear-gradient(90deg, #2c3530 0%, #59675e 38%, #414c46 70%, #262e2a 100%);
-  border-radius: 9px 9px 0 0;
+  background: linear-gradient(90deg, #1c1d20 0%, #3a3c41 45%, #2a2b2f 75%, #1a1b1d 100%);
   pointer-events: none;
 }
-.pole::before { /* cap */
-  content: "";
-  position: absolute;
-  left: 50%; top: -8px;
-  width: 26px; height: 14px;
-  transform: translateX(-50%);
-  border-radius: 13px 13px 4px 4px;
-  background: linear-gradient(90deg, #2c3530, #66746b 40%, #2c3530);
-}
-.sign-hang { position: relative; z-index: 2; padding-top: 20px; transform-origin: 50% 0; }
-.arm {
-  height: 9px;
-  width: 82%;
-  margin: 0 auto;
-  border-radius: 5px;
-  background: linear-gradient(180deg, #56635b, #2c3530);
-}
-.chains { display: flex; justify-content: space-between; width: 64%; height: 18px; margin: 0 auto; }
-.chains i {
-  display: block;
-  width: 4px;
-  height: 100%;
-  background: repeating-linear-gradient(180deg, #2c3530 0 4px, transparent 4px 6px);
-  border-radius: 2px;
-}
-.sign {
+.plaque {
   position: relative;
+  z-index: 2;
+  margin: 0 6px;
   padding: 16px 18px 15px;
   text-align: center;
-  color: #22324a;
-  background: #efe5cc;
-  border-radius: 10px;
-  box-shadow:
-    inset 0 0 0 4px #efe5cc,
-    inset 0 0 0 6px #2e4058,
-    0 12px 22px -10px rgba(0, 0, 0, .55);
+  box-shadow: 0 18px 30px -14px rgba(0, 0, 0, .8);
 }
-.sign::before, .sign::after { /* bolts */
+.plaque::before {
   content: "";
   position: absolute;
-  top: 10px;
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff 0 15%, #8b8676 40%, #4a463d 100%);
+  inset: 5px;
+  border: 1px solid rgba(12, 12, 13, .16);
+  pointer-events: none;
 }
-.sign::before { left: 12px; }
-.sign::after { right: 12px; }
-.sign h3 { margin: 0 0 5px; font-size: 1.6rem; font-weight: 800; letter-spacing: -.015em; }
-.sign p { margin: 0; font-size: 1rem; line-height: 1.35; }
-html.js .phone-scene .sign-hang { transform: rotate(-9deg); opacity: 0; transition: transform 1.2s cubic-bezier(.25, 1.6, .45, 1), opacity .5s; }
-html.js .phone-scene.in-view .sign-hang { transform: none; opacity: 1; }
+.plaque h3 { margin: 0 0 5px; font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+.plaque p { margin: 0; font-size: .98rem; line-height: 1.35; color: #3a3631; }
 
 .phone { position: relative; z-index: 3; width: 240px; height: 236px; margin: 104px auto 0; --gap: 4.8px; --dx: .36px; }
-.mount {
+html.js .phone-scene .phone { opacity: 0; transform: translateY(26px); transition: opacity 1s var(--ease) .35s, transform 1.1s var(--ease) .35s; }
+html.js .phone-scene.in-view .phone { opacity: 1; transform: none; }
+.bracket {
   position: absolute;
-  left: 50%; top: 70px;
-  width: 128px; height: 158px;
+  left: 50%; top: 104px;
+  width: 64px; height: 118px;
   transform: translateX(-50%);
-  border-radius: 12px;
-  background: linear-gradient(180deg, #46524b, #333d38);
-  box-shadow: 0 10px 18px -8px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .08);
+  border-radius: 4px;
+  background: linear-gradient(90deg, #17181a, #2b2c30 50%, #17181a);
 }
-.mount::before, .mount::after { /* screws */
-  content: "";
-  position: absolute;
-  left: 50%;
-  width: 8px; height: 8px;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #c9c4b4 0 20%, #6c685d 60%, #3c3a34 100%);
-}
-.mount::before { top: 10px; }
-.mount::after { bottom: 10px; }
-.body-svg { position: absolute; left: 10px; top: 92px; width: 220px; height: 140px; overflow: visible; filter: drop-shadow(0 10px 10px rgba(0, 0, 0, .3)); }
+.body-svg { position: absolute; left: 10px; top: 92px; width: 220px; height: 140px; overflow: visible; filter: drop-shadow(0 14px 14px rgba(0, 0, 0, .45)); }
+.led { fill: var(--amber); opacity: .25; }
+.phone-scene.in-view .phone:not(.lifted) .led { animation: led 1.9s ease-in-out 1.2s infinite; }
+@keyframes led { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
 .cord { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 4; }
 .cord i {
   position: absolute;
-  left: -3px;
-  top: 209px;
-  width: 18px;
-  height: 9px;
-  border: 2.6px solid #6c2a21;
+  left: -2px;
+  top: 210px;
+  width: 16px;
+  height: 8px;
+  border: 1.8px solid #b9b1a2;
   border-radius: 50%;
-  transform: translate(calc(var(--i) * var(--dx)), calc(var(--i) * var(--gap) * -1)) rotate(-16deg);
-  transition: transform .65s var(--ease-spring);
-  transition-delay: calc(var(--i) * 12ms);
+  transform: translate(calc(var(--i) * var(--dx)), calc(var(--i) * var(--gap) * -1)) rotate(-14deg);
+  transition: transform .7s var(--ease);
+  transition-delay: calc(var(--i) * 10ms);
 }
 .phone.lifted { --gap: 10.6px; --dx: -.9px; }
 .handset {
@@ -501,93 +490,73 @@ html.js .phone-scene.in-view .sign-hang { transform: none; opacity: 1; }
   cursor: pointer;
   border-radius: 30px;
   -webkit-tap-highlight-color: transparent;
-  transition: transform .65s var(--ease-spring);
+  transition: transform .7s cubic-bezier(.25, 1.25, .45, 1);
 }
-.handset:focus-visible { outline: 3px solid #f1e8d3; outline-offset: 6px; }
+.handset:focus-visible { outline-offset: 8px; }
 .handset-inner { display: block; width: 100%; height: 100%; transform-origin: 30% 70%; }
-.handset svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .3)); }
+.handset svg { display: block; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 8px 8px rgba(0, 0, 0, .4)); }
 .phone.lifted .handset { transform: translate(-30px, -128px) rotate(-8deg); cursor: default; }
 .phone-scene.in-view .phone:not(.lifted) .handset-inner { animation: ringing 3.8s ease-in-out 1.4s infinite; }
-.phone.lifted .handset-inner { animation: wobble 1.1s ease-out .3s both; }
+.phone.lifted .handset-inner { animation: wobble 1s ease-out .3s both; }
 @keyframes ringing {
-  0%, 64%, 100% { transform: none; }
-  66% { transform: translateY(-4px) rotate(-2.2deg); }
-  68% { transform: translateY(-4px) rotate(2.2deg); }
-  70% { transform: translateY(-4px) rotate(-2.2deg); }
-  72% { transform: translateY(-4px) rotate(2.2deg); }
-  74% { transform: translateY(-3px) rotate(-1.4deg); }
+  0%, 66%, 100% { transform: none; }
+  68% { transform: translateY(-2px) rotate(-1deg); }
+  70% { transform: translateY(-2px) rotate(1deg); }
+  72% { transform: translateY(-2px) rotate(-1deg); }
+  74% { transform: translateY(-2px) rotate(1deg); }
   77% { transform: none; }
 }
 @keyframes wobble {
   0% { transform: rotate(0); }
-  18% { transform: rotate(-7deg); }
-  38% { transform: rotate(5deg); }
-  58% { transform: rotate(-3deg); }
-  78% { transform: rotate(1.4deg); }
+  20% { transform: rotate(-5deg); }
+  42% { transform: rotate(3.5deg); }
+  64% { transform: rotate(-2deg); }
+  84% { transform: rotate(.8deg); }
   100% { transform: rotate(0); }
 }
-.waves { position: absolute; right: -16px; top: 30px; width: 34px; height: 44px; pointer-events: none; transition: opacity .3s; }
-.waves i {
-  position: absolute;
-  inset: 0;
-  border: 3px solid transparent;
-  border-right-color: #f1e8d3;
-  border-radius: 50%;
-  opacity: 0;
-}
-.waves i:nth-child(2) { inset: -10px; }
-.phone-scene.in-view .phone:not(.lifted) .waves i { animation: wave 3.8s ease-out 1.4s infinite; }
-.phone-scene.in-view .phone:not(.lifted) .waves i:nth-child(2) { animation-delay: 1.52s; }
-.phone.lifted .waves { opacity: 0; }
-@keyframes wave {
-  0%, 64% { opacity: 0; transform: scale(.7); }
-  68% { opacity: 1; }
-  80%, 100% { opacity: 0; transform: scale(1.15); }
-}
-html.js .phone-scene .phone { opacity: 0; transform: translateY(30px); transition: opacity .8s var(--ease-out) .35s, transform .9s var(--ease-out) .35s; }
-html.js .phone-scene.in-view .phone { opacity: 1; transform: none; }
 
 /* Keypad panel */
-.panel-wrap { position: relative; z-index: 3; display: grid; grid-template-rows: 0fr; transition: grid-template-rows .65s var(--ease-out); }
+.panel-wrap { position: relative; z-index: 3; display: grid; grid-template-rows: 0fr; transition: grid-template-rows .7s var(--ease); }
 .phone-stage.lifted .panel-wrap { grid-template-rows: 1fr; }
 .panel-clip { min-height: 0; overflow: hidden; }
-.panel-pad { padding: 28px 2px 44px; }
+.panel-pad { padding: 28px 2px 48px; }
 .panel {
   width: 100%;
-  max-width: 390px;
+  max-width: 400px;
   margin: 0 auto;
   padding: 18px;
-  color: #2b2622;
-  background: #efe6d2;
-  border-radius: 16px;
-  box-shadow: 0 22px 44px -18px rgba(0, 0, 0, .5), inset 0 0 0 1px rgba(0, 0, 0, .06);
+  color: var(--bone);
+  background: #18191c;
+  border: 1px solid rgba(236, 230, 218, .08);
+  border-radius: 14px;
+  box-shadow: 0 30px 60px -24px rgba(0, 0, 0, .8);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-18px) scale(.98);
-  transition: opacity .45s, transform .6s var(--ease-out), visibility 0s linear .6s;
+  transform: translateY(-16px);
+  transition: opacity .45s, transform .7s var(--ease), visibility 0s linear .7s;
 }
 .phone-stage.lifted .panel {
   opacity: 1;
   visibility: visible;
   transform: none;
-  transition: opacity .5s .18s, transform .7s var(--ease-out) .18s, visibility 0s;
+  transition: opacity .6s .18s, transform .8s var(--ease) .18s, visibility 0s;
 }
 .display {
   position: relative;
-  padding: 14px 46px 14px 16px;
-  color: #f1e8d3;
-  background: #2f3d36;
-  border-radius: 10px;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, .5);
+  padding: 14px 46px 12px 16px;
+  color: var(--amber);
+  background: #0b0b0c;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, .7), inset 0 0 0 1px rgba(255, 255, 255, .03);
 }
-.tw { margin: 0; min-height: 4.4em; font-size: 1.02rem; line-height: 1.45; }
+.tw { margin: 0; min-height: 4.4em; font-size: 1.02rem; line-height: 1.45; text-shadow: 0 0 12px rgba(230, 168, 74, .35); }
 .caret {
   display: inline-block;
   width: 2px;
-  height: 1.1em;
+  height: 1.05em;
   margin-left: 2px;
-  vertical-align: -.18em;
-  background: #e3ae4d;
+  vertical-align: -.16em;
+  background: var(--amber);
   animation: blink 1s steps(1) infinite;
 }
 @keyframes blink { 50% { opacity: 0; } }
@@ -596,130 +565,108 @@ html.js .phone-scene.in-view .phone { opacity: 1; transform: none; }
   right: 12px; top: 12px;
   display: grid;
   place-items: center;
-  width: 26px; height: 26px;
+  width: 24px; height: 24px;
+  border: 1px solid rgba(230, 168, 74, .6);
   border-radius: 50%;
-  font-size: .8rem;
-  font-weight: 800;
-  color: #2b2622;
-  background: #e3ae4d;
+  font-size: .74rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   opacity: 0;
-  transform: scale(.6);
-  transition: opacity .25s, transform .35s var(--ease-spring);
+  transition: opacity .3s;
 }
-.disp-num.on { opacity: 1; transform: none; }
-.keypad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.disp-num.on { opacity: 1; }
+.disp-foot { display: flex; justify-content: flex-start; min-height: 32px; margin-top: 8px; }
+.disp-foot .xref { color: var(--bone); border-color: rgba(236, 230, 218, .3); opacity: 0; transform: translateY(4px); transition: opacity .4s, transform .5s var(--ease), background-color .25s, color .25s; }
+.disp-foot .xref.on { opacity: 1; transform: none; }
+.disp-foot .xref:hover { background: var(--bone); color: var(--ink); }
+.keypad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
 .key {
   position: relative;
   height: 56px;
-  border: 0;
-  border-radius: 12px;
-  font-size: 1.45rem;
-  font-weight: 750;
-  color: #2b2622;
-  background: linear-gradient(180deg, #fbf6ea, #e2d6bd);
-  box-shadow: 0 4px 0 #b6a789, 0 7px 12px rgba(0, 0, 0, .16);
+  border: 1px solid rgba(236, 230, 218, .07);
+  border-radius: 10px;
+  font-size: 1.35rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--bone);
+  background: linear-gradient(180deg, #2a2b2f, #222326);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .35), 0 1px 0 rgba(255, 255, 255, .03);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform .1s, box-shadow .1s, background-color .3s, color .3s;
+  transition: transform .1s, background-color .3s, color .3s, border-color .3s;
 }
-.key:active, .key.pressed { transform: translateY(3px); box-shadow: 0 1px 0 #b6a789, 0 2px 4px rgba(0, 0, 0, .2); }
-.key:focus-visible { outline: 3px solid #2f3d36; outline-offset: 3px; }
-.key.playing { background: linear-gradient(180deg, #f5d27e, #dca244); }
-.key.heard { color: #435046; background: linear-gradient(180deg, #c3cdbf, #a7b4a3); box-shadow: 0 4px 0 #7f8c7b, 0 7px 12px rgba(0, 0, 0, .12); }
-.key.heard::after { /* tick */
+.key:active, .key.pressed { transform: translateY(1px); }
+.key.playing { color: var(--ink); background: var(--amber); border-color: var(--amber); }
+.key.heard { color: var(--amber); background: #1c1d20; border-color: rgba(230, 168, 74, .28); }
+.key.heard::after {
   content: "";
   position: absolute;
-  right: 9px; top: 9px;
-  width: 6px; height: 10px;
-  border: solid #2f3d36;
-  border-width: 0 2.5px 2.5px 0;
-  transform: rotate(45deg);
+  right: 8px; top: 8px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--amber);
 }
-.note { margin: 12px 0 0; font-size: .82rem; line-height: 1.4; color: #6b6155; text-align: center; }
+.note { margin: 12px 0 0; font-size: .8rem; line-height: 1.4; color: var(--stone); text-align: center; }
 .report {
   position: relative;
   margin: 16px 0 0;
   padding: 14px 16px;
-  font-size: .98rem;
+  font-size: .97rem;
   line-height: 1.45;
-  color: #f1e8d3;
-  background: #2f3d36;
-  border-radius: 12px;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(10px);
-  transition: opacity .5s, transform .6s var(--ease-out), visibility 0s linear .6s, background-color .6s, color .6s;
+  transform: translateY(8px);
+  transition: opacity .5s, transform .7s var(--ease), visibility 0s linear .7s, background-color .7s;
 }
-.report.show { opacity: 1; visibility: visible; transform: none; transition: opacity .5s, transform .6s var(--ease-out), visibility 0s, background-color .6s, color .6s; }
+.report.show { opacity: 1; visibility: visible; transform: none; transition: opacity .5s, transform .7s var(--ease), visibility 0s, background-color .7s; }
 .report a { color: inherit; white-space: nowrap; text-underline-offset: 3px; }
-.report.done { color: #2b2622; background: #e3ae4d; animation: pop .8s var(--ease-spring); }
+.report.done { background: var(--amber); }
 .report.done::after {
   content: "";
   position: absolute;
-  inset: -4px;
-  border-radius: 15px;
-  border: 3px solid #e3ae4d;
+  inset: -5px;
+  border: 1px solid var(--amber);
+  border-radius: 4px;
   opacity: 0;
-  animation: halo 1.6s ease-out .2s 2;
+  animation: halo 1.8s var(--ease) .1s 2;
   pointer-events: none;
 }
-@keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.045); } 100% { transform: scale(1); } }
-@keyframes halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.08); } }
+@keyframes halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.06); } }
 .close-btn {
   display: block;
   width: 100%;
-  height: 48px;
-  margin-top: 16px;
-  border: 2px solid #2b2622;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 750;
+  height: 46px;
+  margin-top: 14px;
+  border: 1px solid rgba(236, 230, 218, .3);
+  border-radius: 10px;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
   background: transparent;
   cursor: pointer;
-  transition: background-color .2s, color .2s;
+  transition: background-color .25s, color .25s;
 }
-.close-btn:hover { background: #2b2622; color: #efe6d2; }
-.close-btn:focus-visible { outline: 3px solid #2f3d36; outline-offset: 3px; }
+.close-btn:hover { background: var(--bone); color: var(--ink); }
 
 /* ------------------------------------------------------------------
-   3. Çadrat
+   3. Çadrat: a dawn band, then open daylight
 ------------------------------------------------------------------ */
 .umbrellas {
-  color: #10304f;
-  background:
-    radial-gradient(40% 30% at 12% 8%, rgba(255, 255, 255, .7), transparent 70%),
-    linear-gradient(180deg, #8ccfff 0%, #c4eaff 46%, #fff4de 100%);
+  color: var(--ink);
+  padding-top: 150px;
+  background: linear-gradient(180deg, var(--ink-3) 0, #cfd8dc 110px, #dde4e7 40%, #ebe8e2 82%, var(--paper) 100%);
+  background: linear-gradient(in oklab 180deg, var(--ink-3) 0, #cfd8dc 110px, #dde4e7 40%, #ebe8e2 82%, var(--paper) 100%);
 }
-.umbrellas .eyebrow { color: #10304f; }
-.cloud {
-  position: absolute;
-  width: 260px; height: 80px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .8);
-  filter: blur(14px);
-  pointer-events: none;
-  animation: drift 46s ease-in-out infinite alternate;
-}
-.cloud.c1 { top: 9%; left: -60px; }
-.cloud.c2 { top: 48%; right: -90px; width: 320px; animation-duration: 58s; animation-direction: alternate-reverse; opacity: .7; }
-.cloud.c3 { bottom: 6%; left: 30%; width: 220px; animation-duration: 64s; opacity: .55; }
-@keyframes drift { from { transform: translateX(-40px); } to { transform: translateX(60px); } }
-.umb-head {
-  margin: 0 0 30px;
-  font-size: clamp(1.75rem, 6.5vw, 3.4rem);
-  font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -.025em;
-  text-align: center;
-}
+.umb-head { font-weight: 800; color: var(--ink); margin-bottom: clamp(28px, 5vw, 48px); }
 .umb-grid {
   position: relative;
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: clamp(6px, 1.7vw, 22px);
-  width: min(100%, 1040px, calc((100vh - 240px) * 1.62));
-  width: min(100%, 1040px, calc((100svh - 240px) * 1.62));
+  gap: clamp(6px, 1.8vw, 24px);
+  width: min(100%, 1040px, calc((100vh - 330px) * 1.62));
+  width: min(100%, 1040px, calc((100svh - 330px) * 1.62));
   min-width: min(100%, 300px);
   margin: 0 auto;
   padding: 0;
@@ -740,50 +687,45 @@ html.js .phone-scene.in-view .phone { opacity: 1; transform: none; }
   container-type: inline-size;
   container-name: umb;
   -webkit-tap-highlight-color: transparent;
-  transition: transform .6s var(--ease-out);
+  transition: transform .7s var(--ease);
 }
-.umb-btn:focus-visible { outline: 3px solid #10304f; outline-offset: 3px; }
+.umb-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .umb-grid.inplace .umb.open .umb-btn { transform: scale(1.12); }
-@media (hover: hover) {
-  .umb:not(.open) .umb-btn:hover { transform: translateY(-4px); }
-}
+@media (hover: hover) { .umb:not(.open) .umb-btn:hover { transform: translateY(-3px); } }
 .umb-rv, .sway, .card, .face { display: block; width: 100%; height: 100%; }
 html.js .umb-rv {
   opacity: 0;
-  transform: scale(.12) rotate(-140deg);
-  transition: transform 1s cubic-bezier(.3, 1.45, .5, 1), opacity .35s;
-  transition-delay: calc(var(--w) * 75ms + 150ms);
+  transform: scale(.82) rotate(-24deg);
+  transition: transform 1.2s var(--ease), opacity .8s var(--ease);
+  transition-delay: calc(var(--w) * 70ms + 150ms);
 }
 html.js .umbrellas.in-view .umb-rv { opacity: 1; transform: none; }
-.sway {
-  perspective: 800px;
-  transform-origin: 50% 50%;
-  animation: sway var(--sd, 6s) ease-in-out var(--sdl, 0s) infinite alternate;
-}
+.sway { perspective: 900px; transform-origin: 50% 50%; animation: sway var(--sd, 6s) ease-in-out var(--sdl, 0s) infinite alternate; }
 .umb.open .sway { animation-play-state: paused; }
 @keyframes sway {
-  from { transform: rotate(-4deg) translate(-1.5%, -1.5%); }
-  to { transform: rotate(4deg) translate(1.5%, 1.5%); }
+  from { transform: rotate(-2.6deg) translate(-1%, -1%); }
+  to { transform: rotate(2.6deg) translate(1%, 1%); }
 }
-.card { position: relative; transform-style: preserve-3d; transition: transform .8s cubic-bezier(.3, 1.25, .5, 1); }
+.card { position: relative; transform-style: preserve-3d; transition: transform .9s var(--ease); }
 .umb.open .card { transform: rotateY(180deg); }
 .face { position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
 .face svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.front svg { filter: drop-shadow(0 6px 8px rgba(16, 48, 79, .22)); }
+.front svg { filter: drop-shadow(0 8px 10px rgba(12, 12, 13, .16)); }
 .num {
   position: absolute;
   left: 0; right: 0;
-  bottom: 13%;
+  bottom: 15%;
   text-align: center;
-  font-weight: 800;
-  font-size: max(12px, 10cqi);
+  font-weight: 650;
+  font-size: max(11px, 8.5cqi);
   line-height: 1;
-  color: var(--num-ink, #fff);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, .94);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .18);
   pointer-events: none;
 }
 .back { transform: rotateY(180deg); }
-.back-shape svg { filter: drop-shadow(0 8px 12px rgba(16, 48, 79, .22)); }
+.back-shape svg { filter: drop-shadow(0 10px 14px rgba(12, 12, 13, .16)); }
 .back-txt, .ov-txt {
   position: absolute;
   left: 13%; right: 13%;
@@ -792,32 +734,31 @@ html.js .umbrellas.in-view .umb-rv { opacity: 1; transform: none; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4cqi;
+  gap: 4.5cqi;
   text-align: center;
 }
 .msg {
   margin: 0;
   font-size: calc(var(--fs, 9) * 1cqi);
-  font-weight: 800;
-  line-height: 1.12;
-  letter-spacing: -.01em;
-  color: #10233a;
+  font-weight: 750;
+  line-height: 1.14;
+  letter-spacing: -.012em;
+  color: var(--ink);
   text-wrap: balance;
 }
 .art {
   margin: 0;
-  font-size: max(10px, 5.2cqi);
+  font-size: max(9px, 4.6cqi);
   font-weight: 700;
-  letter-spacing: .03em;
-  color: var(--ink2, #445);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink2, #555);
 }
-.mini { display: none; font-size: 30cqi; font-weight: 800; color: var(--ink2, #445); }
+.mini { display: none; font-size: 28cqi; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink2, #555); }
 @container umb (max-width: 139px) {
   .back-txt .msg, .back-txt .art { display: none; }
   .back-txt .mini { display: block; }
 }
-
-/* Phone-size reading card for a flipped umbrella */
 .umb-overlay {
   position: fixed;
   inset: 0;
@@ -837,70 +778,70 @@ html.js .umbrellas.in-view .umb-rv { opacity: 1; transform: none; }
   pointer-events: auto;
   cursor: pointer;
   transform-origin: 50% 50%;
-  filter: drop-shadow(0 26px 40px rgba(16, 48, 79, .38));
+  filter: drop-shadow(0 30px 44px rgba(12, 12, 13, .3));
 }
 .ov-card svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.umb-foot { margin: 34px 0 0; text-align: center; font-size: .95rem; color: #24486b; }
+.umb-foot { margin: clamp(30px, 5vw, 46px) 0 0; text-align: center; font-size: .92rem; color: #4a4741; }
 
 /* ------------------------------------------------------------------
-   4. Outro
+   4. Outro, in the light
 ------------------------------------------------------------------ */
-.outro {
-  text-align: center;
-  color: #f6f1e7;
-  background:
-    radial-gradient(70% 50% at 50% 30%, rgba(92, 140, 220, .18), transparent 70%),
-    #0f1c31;
-}
-.outro-motifs { display: flex; justify-content: center; gap: clamp(26px, 8vw, 64px); }
-.outro-motifs svg { width: clamp(38px, 9vw, 52px); height: auto; overflow: visible; }
-html.js .outro .om { opacity: 0; transform: translateX(var(--from)); transition: transform 1.1s var(--ease-out), opacity .8s; }
+.outro { text-align: center; color: var(--ink); background: var(--paper); }
+.outro-marks { display: flex; justify-content: center; align-items: flex-end; gap: 18px; color: var(--ink); }
+.outro-marks .glyph { width: 14px; height: 14px; }
+.outro-marks .g-dome { width: 16px; height: 8px; }
+.outro-marks .g-ci { color: var(--amber); background: var(--amber); }
+html.js .outro .om { opacity: 0; transform: translateX(var(--from)); transition: transform 1.2s var(--ease), opacity .9s; }
 html.js .outro.in-view .om { opacity: 1; transform: none; }
 .outro h2 {
-  max-width: 20ch;
-  margin: 34px auto 26px;
-  font-size: clamp(1.7rem, 6vw, 3.2rem);
+  max-width: 19ch;
+  margin: 30px auto 34px;
+  font-size: clamp(1.7rem, 5.6vw, 3.1rem);
   font-weight: 800;
   line-height: 1.12;
-  letter-spacing: -.02em;
+  letter-spacing: -.025em;
+  text-wrap: balance;
 }
-.outro-call { margin: 0; font-size: clamp(1.1rem, 3.6vw, 1.45rem); color: #cdd6e4; }
+.outro-call { margin: 0; font-size: .74rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #5c5850; }
 .outro-call a {
   display: block;
-  margin-top: 8px;
-  font-size: clamp(2.3rem, 10vw, 4.4rem);
+  width: max-content;
+  margin: 12px auto 0;
+  padding-bottom: 6px;
+  font-size: clamp(2.4rem, 10vw, 4.6rem);
   font-weight: 800;
-  letter-spacing: .02em;
-  color: #ffd23f;
+  letter-spacing: -.01em;
+  text-transform: none;
+  color: var(--ink);
   text-decoration: none;
+  border-bottom: 4px solid var(--amber);
 }
-.outro-call a:focus-visible { outline-color: #ffd23f; border-radius: 8px; }
-.confetti { display: flex; justify-content: center; gap: 7px; margin: 34px 0 0; padding: 0; list-style: none; }
-.confetti li { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
-html.js .outro .confetti li { opacity: 0; transform: translateY(12px) scale(.4); transition: transform .6s var(--ease-spring), opacity .4s; transition-delay: calc(var(--i) * 45ms + 900ms); }
-html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
 
 /* ------------------------------------------------------------------
    Larger screens
 ------------------------------------------------------------------ */
 @media (min-width: 700px) {
-  .scene { padding: 88px 40px 80px; }
+  .scene { padding: 92px 40px 84px; }
+  .umbrellas { padding-top: 170px; }
   .dots { right: 14px; }
+  .gallery { gap: 44px 22px; }
+  .tag { font-size: .8rem; padding: 5px 10px 6px; }
 }
 @media (min-width: 900px) {
-  .gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 30px; }
-  .inscription { margin-bottom: 72px; }
-  .museum { padding-bottom: 150px; }
+  .gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 52px 30px; }
+  .objbox { width: 76%; }
+  .exhibit.active .obj { transform: translateY(-14px) scale(1.42); }
+  .museum { padding-bottom: 170px; }
   .museum-card { bottom: 28px; }
   .dots a[aria-current="true"] .dot-label { opacity: 1; transform: none; }
 
   .phone-stage { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: center; }
-  .rig-col { transform: translateX(calc(50% + 16px)); transition: transform .9s var(--ease-out); }
+  .rig-col { transform: translateX(calc(50% + 16px)); transition: transform 1s var(--ease); }
   .phone-stage.lifted .rig-col { transform: none; }
   .panel-wrap { grid-template-rows: 1fr; }
   .panel-clip { overflow: visible; }
   .panel-pad { padding: 10px 6px 16px; }
-  .panel { transform: translateX(-34px); }
+  .panel { transform: translateX(-30px); }
 }
 
 /* ------------------------------------------------------------------
@@ -908,226 +849,319 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
 ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation: none !important;
-    transition: none !important;
-  }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
   html.js .rv,
   html.js .umb-rv,
   html.js .phone-scene .phone,
-  html.js .phone-scene .sign-hang,
-  html.js .outro .om,
-  html.js .outro .confetti li { opacity: 1; transform: none; }
+  html.js .outro .om { opacity: 1; transform: none; }
   .beam > span, .pool { opacity: 1; }
-  .caret { opacity: 1; }
+  .led { opacity: 1; }
 }
 </style>
 </head>
 <body>
 
-<!-- Shared SVG gradients -->
 <svg class="defs" aria-hidden="true" focusable="false">
   <defs>
-    <linearGradient id="g-env" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fdfcf8"/><stop offset="1" stop-color="#e6e1d5"/>
-    </linearGradient>
-    <radialGradient id="g-bulge" cx="50%" cy="45%" r="55%">
-      <stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="g-frame" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7a5532"/><stop offset=".5" stop-color="#4f341d"/><stop offset="1" stop-color="#6b4a2b"/>
-    </linearGradient>
-    <linearGradient id="g-sack" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#cdbf9f"/><stop offset=".35" stop-color="#f1e9d6"/><stop offset=".7" stop-color="#e8dec7"/><stop offset="1" stop-color="#bfb08e"/>
-    </linearGradient>
-    <linearGradient id="g-phone" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#a5503f"/><stop offset="1" stop-color="#7f3529"/>
-    </linearGradient>
-    <linearGradient id="g-handset" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#b65a47"/><stop offset="1" stop-color="#8a3b2f"/>
-    </linearGradient>
+    <linearGradient id="g-env" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbf9f4"/><stop offset="1" stop-color="#e2ddd1"/></linearGradient>
+    <radialGradient id="g-bulge" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <linearGradient id="g-frame" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b3631"/><stop offset=".5" stop-color="#221f1c"/><stop offset="1" stop-color="#34302b"/></linearGradient>
+    <linearGradient id="g-sack" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c9bfa8"/><stop offset=".35" stop-color="#eee8da"/><stop offset=".7" stop-color="#e6dfcf"/><stop offset="1" stop-color="#bdb299"/></linearGradient>
+    <linearGradient id="g-cup" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d8d2c6"/><stop offset=".35" stop-color="#fbf9f5"/><stop offset=".75" stop-color="#efebe3"/><stop offset="1" stop-color="#cdc6b8"/></linearGradient>
+    <linearGradient id="g-metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9e9ea"/><stop offset=".5" stop-color="#a7a9ad"/><stop offset="1" stop-color="#d7d8da"/></linearGradient>
+    <linearGradient id="g-brass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9b46a"/><stop offset=".5" stop-color="#9c7a3c"/><stop offset="1" stop-color="#c8a35a"/></linearGradient>
+    <linearGradient id="g-wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a3b22"/><stop offset=".45" stop-color="#8b5e37"/><stop offset="1" stop-color="#4f331e"/></linearGradient>
+    <linearGradient id="g-hat" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b98f25"/><stop offset=".4" stop-color="#e2bb48"/><stop offset="1" stop-color="#a87f1d"/></linearGradient>
+    <linearGradient id="g-phone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eee8dc"/><stop offset="1" stop-color="#cfc7b7"/></linearGradient>
+    <linearGradient id="g-handset" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3eee4"/><stop offset="1" stop-color="#d3cbbb"/></linearGradient>
     <radialGradient id="g-canopy" cx="50%" cy="50%" r="50%">
-      <stop offset="0" stop-color="#fff" stop-opacity=".38"/>
-      <stop offset=".5" stop-color="#fff" stop-opacity=".06"/>
-      <stop offset="1" stop-color="#000" stop-opacity=".16"/>
+      <stop offset="0" stop-color="#fff" stop-opacity=".24"/><stop offset=".55" stop-color="#fff" stop-opacity=".03"/><stop offset="1" stop-color="#000" stop-opacity=".12"/>
     </radialGradient>
   </defs>
 </svg>
 
 <nav class="dots" aria-label="Përparimi">
-  <a href="#muzeu" data-sec="muzeu"><span class="dot-label">Muzeu</span><span class="dot"></span></a>
-  <a href="#telefoni" data-sec="telefoni"><span class="dot-label">Telefoni</span><span class="dot"></span></a>
-  <a href="#cadrat" data-sec="cadrat"><span class="dot-label">Çadrat</span><span class="dot"></span></a>
+  <a href="#muzeu" data-sec="muzeu"><span class="dot-label">Muzeu</span><span class="glyph g-sq"></span></a>
+  <a href="#telefoni" data-sec="telefoni"><span class="dot-label">Telefoni</span><span class="glyph g-ci"></span></a>
+  <a href="#cadrat" data-sec="cadrat"><span class="dot-label">Çadrat</span><span class="glyph g-dome"></span></a>
 </nav>
 
 <main>
 
 <!-- 0. Intro -->
 <section id="intro" class="scene intro" data-sec="intro" aria-labelledby="intro-title">
+  <span class="beam fade" aria-hidden="true"><span></span></span>
   <div class="wrap">
     <h1 id="intro-title" class="intro-title">
       <span class="w rv" style="--d:0">Tri</span> <span class="w rv" style="--d:1">instalacione,</span> <span class="w rv" style="--d:2">një</span> <span class="w rv" style="--d:3">mesazh</span>
     </h1>
     <p class="intro-sub">
-      <span class="motif m-see rv" style="--d:6">
-        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 4h8M24 4l-11 22M24 4l11 22" opacity=".45"/>
-          <rect x="16" y="20" width="16" height="10" rx="1"/><path d="M16 21l8 5 8-5"/>
-          <path d="M13 32h22v12H13z"/>
-        </svg>
-        <span>Shih.</span>
-      </span>
-      <span class="motif m-hear rv" style="--d:7">
-        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M9 18c-3-6 1-10 5-11l4 7-4 3c1 5 6 11 11 13l3-4 7 4c-1 4-5 8-11 5C15 33 11 26 9 18z"/>
-          <path d="M33 10c3 1 5 3 6 6M33 4c6 1 10 5 11 11" opacity=".55"/>
-        </svg>
-        <span>Dëgjo.</span>
-      </span>
-      <span class="motif m-safe rv" style="--d:8">
-        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M4 24C4 13 13 6 24 6s20 7 20 18c-2.5-2.5-5.5-2.5-8 0-2.5-2.5-5.5-2.5-8 0-1.3-1.3-2.7-2-4-2s-2.7.7-4 2c-2.5-2.5-5.5-2.5-8 0-2.5-2.5-5.5-2.5-8 0z"/>
-          <path d="M24 22v17c0 4-6 4-6 0"/>
-        </svg>
-        <span>Mbrohu.</span>
-      </span>
+      <span class="motif rv" style="--d:6"><span class="glyph g-sq" aria-hidden="true"></span><span>Shih.</span></span>
+      <span class="motif rv" style="--d:7"><span class="glyph g-ci" aria-hidden="true"></span><span>Dëgjo.</span></span>
+      <span class="motif rv" style="--d:8"><span class="glyph g-dome" aria-hidden="true"></span><span>Mbrohu.</span></span>
     </p>
   </div>
-  <a class="hint rv" style="--d:11" href="#muzeu">
-    <span>Rrëshqit poshtë</span>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-  </a>
+  <a class="hint rv" style="--d:11" href="#muzeu"><span>Rrëshqit poshtë</span><span class="line" aria-hidden="true"></span></a>
 </section>
 
 <!-- 1. Muzeu i Korrupsionit -->
 <section id="muzeu" class="scene museum" data-sec="muzeu" aria-labelledby="muzeu-title">
   <div class="wrap">
-    <h2 id="muzeu-title" class="eyebrow rv"><span class="n" aria-hidden="true">01</span>Muzeu i Korrupsionit</h2>
-    <p class="inscription rv" style="--d:1">“Muze, sepse shpresojmë që një ditë këto të jenë histori.”</p>
+    <header class="sec-head rv">
+      <span class="sh-l"><span class="glyph g-sq" aria-hidden="true"></span><span class="sh-num" aria-hidden="true">01</span><h2 id="muzeu-title">Muzeu i Korrupsionit</h2></span>
+      <span class="sh-word">Shih.</span>
+    </header>
+    <p class="statement inscription rv" style="--d:1">“Muze, sepse shpresojmë që një ditë këto të jenë histori.”</p>
 
     <div class="gallery" id="gallery">
-      <!-- Zarfi -->
-      <button type="button" class="exhibit rv" style="--d:3" data-i="0" aria-expanded="false" aria-controls="museum-card">
+
+      <button type="button" class="exhibit rv" style="--d:2" data-i="0" aria-expanded="false" aria-controls="museum-card">
         <span class="objbox">
-          <span class="beam" style="--d:0" aria-hidden="true"><span></span></span>
-          <span class="pool" style="--d:0" aria-hidden="true"></span>
-          <span class="obj">
-            <svg viewBox="0 0 120 90" aria-hidden="true">
-              <g transform="rotate(-4 60 88)">
-                <rect x="14" y="27" width="92" height="60" rx="3" fill="url(#g-env)" stroke="#cbc5b6" stroke-width=".8"/>
-                <ellipse cx="60" cy="58" rx="40" ry="22" fill="url(#g-bulge)" opacity=".7"/>
-                <path d="M15 86 L52 57 M105 86 L68 57" stroke="#d9d3c5" stroke-width="1" fill="none"/>
-                <path d="M14.5 28 L60 61 L105.5 28 Z" fill="#000" opacity=".045"/>
-                <path d="M14.5 28 L60 61 L105.5 28" stroke="#cfc9ba" stroke-width="1.1" fill="none"/>
-                <path d="M54 62 q-1 6 2 9 q2 -3 1 -6" fill="#7d1717"/>
-                <circle cx="60" cy="61" r="7.6" fill="#8c1c1c"/>
-                <circle cx="60" cy="61" r="5" fill="none" stroke="#b33b36" stroke-width=".9"/>
-                <path d="M57.5 61h5M60 58.5v5" stroke="#b33b36" stroke-width=".9"/>
-                <circle cx="57.6" cy="58.6" r="1.4" fill="#fff" opacity=".35"/>
-              </g>
-            </svg>
-          </span>
+          <span class="beam" style="--d:0" aria-hidden="true"><span></span></span><span class="pool" style="--d:0" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <g transform="rotate(-4 60 88)">
+              <rect x="14" y="27" width="92" height="60" rx="2.5" fill="url(#g-env)"/>
+              <ellipse cx="60" cy="58" rx="40" ry="22" fill="url(#g-bulge)" opacity=".6"/>
+              <path d="M15 86 L52 57 M105 86 L68 57" stroke="#d3cdbf" stroke-width=".9" fill="none"/>
+              <path d="M14.5 28 L60 61 L105.5 28 Z" fill="#000" opacity=".04"/>
+              <path d="M14.5 28 L60 61 L105.5 28" stroke="#cbc4b5" stroke-width="1" fill="none"/>
+              <circle cx="60" cy="61" r="7" fill="#7d1e1a"/>
+              <circle cx="60" cy="61" r="4.6" fill="none" stroke="#a5382f" stroke-width=".8"/>
+            </g>
+          </svg></span>
         </span>
         <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
         <span class="tag">Zarfi</span>
       </button>
 
-      <!-- Diploma -->
-      <button type="button" class="exhibit rv" style="--d:4" data-i="1" aria-expanded="false" aria-controls="museum-card">
+      <button type="button" class="exhibit rv" style="--d:3" data-i="1" aria-expanded="false" aria-controls="museum-card">
         <span class="objbox">
-          <span class="beam" style="--d:1" aria-hidden="true"><span></span></span>
-          <span class="pool" style="--d:1" aria-hidden="true"></span>
-          <span class="obj">
-            <svg viewBox="0 0 120 90" aria-hidden="true">
-              <path d="M44 86 L52 70 M76 86 L68 70" stroke="#3a2a1a" stroke-width="2.4" stroke-linecap="round"/>
-              <rect x="20" y="6" width="80" height="78" rx="2" fill="url(#g-frame)"/>
-              <rect x="25.5" y="11.5" width="69" height="67" fill="none" stroke="#d3ad62" stroke-width="1"/>
-              <rect x="27" y="13" width="66" height="64" fill="#ece2c9"/>
-              <rect x="31" y="17" width="58" height="56" fill="#fbf6e8"/>
-              <path d="M44 28 q3 -4 6 0 t6 0 t6 0 t6 0 t6 0" fill="none" stroke="#3b3326" stroke-width="1.4" stroke-linecap="round"/>
-              <rect x="40" y="36" width="40" height="1.6" rx=".8" fill="#9c9282"/>
-              <rect x="37" y="41" width="46" height="1.6" rx=".8" fill="#b4ab9c"/>
-              <rect x="40" y="46" width="40" height="1.6" rx=".8" fill="#b4ab9c"/>
-              <rect x="43" y="51" width="34" height="1.6" rx=".8" fill="#b4ab9c"/>
-              <path d="M36 66 c4 -5 6 2 9 -2 s4 3 7 0" fill="none" stroke="#2c2a33" stroke-width="1" stroke-linecap="round"/>
-              <rect x="35" y="68.5" width="18" height=".8" fill="#9c9282"/>
-              <g transform="translate(77 62) rotate(24)" opacity=".86">
-                <circle r="10" fill="none" stroke="#2f53a0" stroke-width="1.7"/>
-                <circle r="6.6" fill="none" stroke="#2f53a0" stroke-width=".9"/>
-                <path d="M0 -4.2 L1.2 -1.3 L4.2 -1.3 L1.8 .6 L2.7 3.6 L0 1.9 L-2.7 3.6 L-1.8 .6 L-4.2 -1.3 L-1.2 -1.3 Z" fill="#2f53a0"/>
-              </g>
-              <g transform="translate(79.5 60.5) rotate(31)" opacity=".22">
-                <circle r="10" fill="none" stroke="#2f53a0" stroke-width="1.4"/>
-              </g>
-              <rect x="20" y="6" width="80" height="4" fill="#fff" opacity=".08"/>
-            </svg>
-          </span>
+          <span class="beam" style="--d:1" aria-hidden="true"><span></span></span><span class="pool" style="--d:1" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <path d="M46 87 L53 70 M74 87 L67 70" stroke="#1d1b19" stroke-width="2.2" stroke-linecap="round"/>
+            <rect x="22" y="6" width="76" height="78" rx="1" fill="url(#g-frame)"/>
+            <rect x="28" y="12" width="64" height="66" fill="#ebe4d4"/>
+            <rect x="32" y="16" width="56" height="58" fill="#faf7ef"/>
+            <path d="M45 28 q3 -4 6 0 t6 0 t6 0 t6 0 t6 0" fill="none" stroke="#2f2b25" stroke-width="1.3" stroke-linecap="round"/>
+            <rect x="41" y="36" width="38" height="1.4" rx=".7" fill="#9c9587"/>
+            <rect x="38" y="41" width="44" height="1.4" rx=".7" fill="#b7b0a3"/>
+            <rect x="41" y="46" width="38" height="1.4" rx=".7" fill="#b7b0a3"/>
+            <rect x="44" y="51" width="32" height="1.4" rx=".7" fill="#b7b0a3"/>
+            <path d="M37 66 c4 -5 6 2 9 -2 s4 3 7 0" fill="none" stroke="#2c2a33" stroke-width=".9" stroke-linecap="round"/>
+            <g transform="translate(76 63) rotate(24)" opacity=".85">
+              <circle r="9.6" fill="none" stroke="#2d4f93" stroke-width="1.5"/>
+              <circle r="6.4" fill="none" stroke="#2d4f93" stroke-width=".8"/>
+              <path d="M0 -3.8 L1.1 -1.2 L3.8 -1.2 L1.6 .5 L2.4 3.2 L0 1.7 L-2.4 3.2 L-1.6 .5 L-3.8 -1.2 L-1.1 -1.2 Z" fill="#2d4f93"/>
+            </g>
+            <g transform="translate(78.5 61.5) rotate(31)" opacity=".2"><circle r="9.6" fill="none" stroke="#2d4f93" stroke-width="1.3"/></g>
+          </svg></span>
         </span>
         <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
         <span class="tag">Diploma</span>
       </button>
 
-      <!-- Thesi i miellit -->
-      <button type="button" class="exhibit rv" style="--d:5" data-i="2" aria-expanded="false" aria-controls="museum-card">
+      <button type="button" class="exhibit rv" style="--d:4" data-i="2" aria-expanded="false" aria-controls="museum-card">
         <span class="objbox">
-          <span class="beam" style="--d:2" aria-hidden="true"><span></span></span>
-          <span class="pool" style="--d:2" aria-hidden="true"></span>
-          <span class="obj">
-            <svg viewBox="0 0 120 90" aria-hidden="true">
-              <ellipse cx="38" cy="87.5" rx="7" ry="1.6" fill="#fff" opacity=".35"/>
-              <ellipse cx="86" cy="88" rx="5" ry="1.2" fill="#fff" opacity=".3"/>
-              <path d="M38 32 C30 42 25 60 27 74 C28 84 39 88 60 88 C81 88 92 84 93 74 C95 60 90 42 82 32 C74 28 46 28 38 32 Z" fill="url(#g-sack)"/>
-              <path d="M44 33 C46 24 50 20 53 15 L67 15 C70 20 74 24 76 33 Z" fill="#e3d8c0"/>
-              <path d="M53 15 L49 7 L56 11 L60 4 L64 11 L71 7 L67 15 Z" fill="#efe6d1"/>
-              <path d="M47 23 Q60 28 73 23" fill="none" stroke="#8a6a3e" stroke-width="2.6" stroke-linecap="round"/>
-              <path d="M70 24 l5 6 M72 23 l2 8" stroke="#8a6a3e" stroke-width="1.4" stroke-linecap="round"/>
-              <path d="M40 46 Q44 60 40 76 M80 46 Q76 60 80 76" fill="none" stroke="#000" stroke-opacity=".07" stroke-width="1.4"/>
-              <path d="M52 38 q2 4 0 8 M68 38 q-2 4 0 8" fill="none" stroke="#000" stroke-opacity=".06" stroke-width="1.2"/>
-              <g fill="#8a3a2e" opacity=".85">
-                <path d="M60 44 v12" stroke="#8a3a2e" stroke-width="1.2"/>
-                <ellipse cx="57.4" cy="47" rx="1.6" ry="3" transform="rotate(-28 57.4 47)"/>
-                <ellipse cx="62.6" cy="47" rx="1.6" ry="3" transform="rotate(28 62.6 47)"/>
-                <ellipse cx="57.4" cy="52" rx="1.6" ry="3" transform="rotate(-28 57.4 52)"/>
-                <ellipse cx="62.6" cy="52" rx="1.6" ry="3" transform="rotate(28 62.6 52)"/>
-                <ellipse cx="60" cy="42.5" rx="1.4" ry="2.6"/>
-              </g>
-              <text x="60" y="71" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="13" fill="#8a3a2e" opacity=".88">25 kg</text>
-              <rect x="42" y="60" width="36" height=".9" fill="#8a3a2e" opacity=".5"/>
-            </svg>
-          </span>
+          <span class="beam" style="--d:2" aria-hidden="true"><span></span></span><span class="pool" style="--d:2" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <ellipse cx="38" cy="87.6" rx="7" ry="1.4" fill="#fff" opacity=".3"/>
+            <path d="M38 32 C30 42 25 60 27 74 C28 84 39 88 60 88 C81 88 92 84 93 74 C95 60 90 42 82 32 C74 28 46 28 38 32 Z" fill="url(#g-sack)"/>
+            <path d="M44 33 C46 24 50 20 53 15 L67 15 C70 20 74 24 76 33 Z" fill="#ddd4c0"/>
+            <path d="M53 15 L49 7 L56 11 L60 4 L64 11 L71 7 L67 15 Z" fill="#ebe4d3"/>
+            <path d="M47 23 Q60 28 73 23" fill="none" stroke="#7b6444" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M40 46 Q44 60 40 76 M80 46 Q76 60 80 76" fill="none" stroke="#000" stroke-opacity=".07" stroke-width="1.3"/>
+            <rect x="42" y="56" width="36" height=".8" fill="#6d3a2c" opacity=".45"/>
+            <text x="60" y="71" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="12.5" fill="#6d3a2c" opacity=".85">25 kg</text>
+            <rect x="42" y="75" width="36" height=".8" fill="#6d3a2c" opacity=".45"/>
+          </svg></span>
         </span>
         <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
         <span class="tag">Thesi i miellit</span>
       </button>
 
-      <!-- Tulla e çarë -->
-      <button type="button" class="exhibit rv" style="--d:6" data-i="3" aria-expanded="false" aria-controls="museum-card">
+      <button type="button" class="exhibit rv" style="--d:5" data-i="3" aria-expanded="false" aria-controls="museum-card">
         <span class="objbox">
-          <span class="beam" style="--d:3" aria-hidden="true"><span></span></span>
-          <span class="pool" style="--d:3" aria-hidden="true"></span>
-          <span class="obj">
-            <svg viewBox="0 0 120 90" aria-hidden="true">
-              <polygon points="14,50 36,36 108,36 86,50" fill="#d27149"/>
-              <polygon points="14,50 86,50 86,84 14,84" fill="#b4532f"/>
-              <polygon points="86,50 108,36 108,70 86,84" fill="#8a3a21"/>
-              <g fill="#7a2f19" opacity=".45">
-                <circle cx="24" cy="60" r=".9"/><circle cx="33" cy="74" r="1.1"/><circle cx="70" cy="58" r=".8"/>
-                <circle cx="78" cy="77" r="1"/><circle cx="62" cy="68" r=".7"/><circle cx="96" cy="58" r=".9"/>
-                <circle cx="40" cy="43" r=".8"/><circle cx="88" cy="40" r=".9"/>
-              </g>
-              <path d="M14 50 L86 50 L108 36" fill="none" stroke="#e79a76" stroke-width=".8" opacity=".7"/>
-              <path d="M62 36 L57 41 L61 45 L54 50" fill="none" stroke="#2a110a" stroke-width="1.8" stroke-linejoin="round"/>
-              <path d="M54 50 L51 56 L57 61 L50 67 L55 73 L50 79 L52 84" fill="none" stroke="#2a110a" stroke-width="2.3" stroke-linejoin="round"/>
-              <path d="M55.5 50 L52.8 56 L58.6 61 L51.8 67 L56.8 73 L52 79 L53.8 84" fill="none" stroke="#e08a63" stroke-width=".7" opacity=".8"/>
-              <path d="M57 61 L66 63 L71 60" fill="none" stroke="#2a110a" stroke-width="1" stroke-linejoin="round" opacity=".8"/>
-              <polygon points="44,86 48,84 49,87" fill="#a8492a"/>
-              <polygon points="58,87 61,85 63,88" fill="#9c4226"/>
-            </svg>
-          </span>
+          <span class="beam" style="--d:3" aria-hidden="true"><span></span></span><span class="pool" style="--d:3" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <polygon points="14,50 36,36 108,36 86,50" fill="#b9694a"/>
+            <polygon points="14,50 86,50 86,84 14,84" fill="#9c5238"/>
+            <polygon points="86,50 108,36 108,70 86,84" fill="#743a26"/>
+            <path d="M14 50 L86 50 L108 36" fill="none" stroke="#d99a7c" stroke-width=".7" opacity=".6"/>
+            <path d="M62 36 L57 41 L61 45 L54 50" fill="none" stroke="#1e0e08" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M54 50 L51 56 L57 61 L50 67 L55 73 L50 79 L52 84" fill="none" stroke="#1e0e08" stroke-width="2.1" stroke-linejoin="round"/>
+            <path d="M57 61 L66 63 L71 60" fill="none" stroke="#1e0e08" stroke-width=".9" stroke-linejoin="round" opacity=".8"/>
+            <polygon points="58,87 61,85 63,88" fill="#874630"/>
+          </svg></span>
         </span>
         <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
         <span class="tag">Tulla e çarë</span>
       </button>
+
+      <button type="button" class="exhibit rv" style="--d:2" data-i="4" aria-expanded="false" aria-controls="museum-card">
+        <span class="objbox">
+          <span class="beam" style="--d:4" aria-hidden="true"><span></span></span><span class="pool" style="--d:4" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <path d="M18 88 L36 80 L44 89 Z" fill="#8e9a86"/>
+            <path d="M24 87 L37 82" stroke="#6f7b68" stroke-width=".8"/>
+            <ellipse cx="60" cy="85" rx="40" ry="5" fill="#c8c1b3"/>
+            <ellipse cx="60" cy="83.4" rx="40" ry="5" fill="#f1ede5"/>
+            <ellipse cx="60" cy="83.4" rx="26" ry="3" fill="#e2ddd3"/>
+            <path d="M37 46 C37 64 43 78 51 81 L69 81 C77 78 83 64 83 46 Z" fill="url(#g-cup)"/>
+            <path d="M38.2 55 C48 58.5 72 58.5 81.8 55" stroke="#a68646" stroke-width="1.1" fill="none"/>
+            <ellipse cx="60" cy="46" rx="23" ry="5.4" fill="#faf8f3"/>
+            <ellipse cx="60" cy="46.6" rx="20" ry="4.1" fill="#2e1c12"/>
+            <ellipse cx="55" cy="45.8" rx="6" ry="1" fill="#5a3b28" opacity=".5"/>
+          </svg></span>
+        </span>
+        <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
+        <span class="tag">Filxhani i kafesë</span>
+      </button>
+
+      <button type="button" class="exhibit rv" style="--d:3" data-i="5" aria-expanded="false" aria-controls="museum-card">
+        <span class="objbox">
+          <span class="beam" style="--d:5" aria-hidden="true"><span></span></span><span class="pool" style="--d:5" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <path d="M24 22 L60 22 L65 28 L96 28 L96 87 L24 87 Z" fill="#b89a5f"/>
+            <rect x="30" y="18" width="58" height="62" fill="#f3efe5" transform="rotate(-3 59 49)"/>
+            <rect x="33" y="26" width="58" height="60" fill="#faf7f0"/>
+            <rect x="39" y="34" width="30" height="1.4" fill="#9c9587"/>
+            <rect x="39" y="39" width="44" height="1.2" fill="#c2bbae"/>
+            <rect x="39" y="43" width="40" height="1.2" fill="#c2bbae"/>
+            <path d="M84 20 L84 34 Q84 38 80 38 Q76 38 76 34 L76 24" fill="none" stroke="url(#g-metal)" stroke-width="1.6"/>
+            <path d="M20 44 L92 44 L96 87 L24 87 Z" fill="#cfb57c"/>
+            <path d="M20 44 L92 44" stroke="#e4d2a4" stroke-width=".8"/>
+            <rect x="36" y="56" width="34" height="11" fill="#efe5cc"/>
+            <rect x="39" y="59.5" width="22" height="1.3" fill="#8f8572"/>
+            <rect x="39" y="63" width="15" height="1.2" fill="#b1a790"/>
+          </svg></span>
+        </span>
+        <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
+        <span class="tag">Dosja e tenderit</span>
+      </button>
+
+      <button type="button" class="exhibit rv" style="--d:4" data-i="6" aria-expanded="false" aria-controls="museum-card">
+        <span class="objbox">
+          <span class="beam" style="--d:6" aria-hidden="true"><span></span></span><span class="pool" style="--d:6" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <ellipse cx="88" cy="86.4" rx="15" ry="3" fill="none" stroke="#2d4f93" stroke-width="1.3" opacity=".75"/>
+            <ellipse cx="88" cy="86.4" rx="10" ry="2" fill="none" stroke="#2d4f93" stroke-width=".7" opacity=".6"/>
+            <ellipse cx="52" cy="22" rx="11" ry="10" fill="url(#g-wood)"/>
+            <ellipse cx="49" cy="18" rx="4" ry="2.6" fill="#fff" opacity=".18"/>
+            <path d="M47 30 L57 30 L59 52 L45 52 Z" fill="url(#g-wood)"/>
+            <rect x="32" y="52" width="40" height="22" rx="1.5" fill="#2a2a2d"/>
+            <rect x="32" y="52" width="40" height="3" fill="#3b3b40"/>
+            <rect x="30" y="74" width="44" height="7" fill="url(#g-metal)"/>
+            <rect x="31" y="81" width="42" height="5" fill="#141415"/>
+          </svg></span>
+        </span>
+        <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
+        <span class="tag">Vula</span>
+      </button>
+
+      <button type="button" class="exhibit rv" style="--d:5" data-i="7" aria-expanded="false" aria-controls="museum-card">
+        <span class="objbox">
+          <span class="beam" style="--d:7" aria-hidden="true"><span></span></span><span class="pool" style="--d:7" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <path d="M46 88 L50 76 L70 76 L74 88 Z" fill="url(#g-metal)"/>
+            <rect x="57" y="70" width="6" height="8" fill="#8f9296"/>
+            <path d="M38 14 l4 2.5 l4 -2.5 l4 2.5 l4 -2.5 l4 2.5 l4 -2.5 l4 2.5 l4 -2.5 l4 2.5 l4 -2.5 L82 74 L38 74 Z" fill="#f6f2e9"/>
+            <path d="M38 74 L82 74" stroke="#d6cfc1" stroke-width="1"/>
+            <rect x="44" y="24" width="32" height="1.2" fill="#a39b8c"/>
+            <text x="60" y="54" text-anchor="middle" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif" font-weight="800" font-size="24" fill="#18181a" letter-spacing="-1">47</text>
+            <g fill="#2a2a2c"><rect x="46" y="62" width="1" height="7"/><rect x="48.5" y="62" width="2" height="7"/><rect x="52" y="62" width="1" height="7"/><rect x="54.5" y="62" width="1.5" height="7"/><rect x="58" y="62" width="1" height="7"/><rect x="60.5" y="62" width="2.2" height="7"/><rect x="64.5" y="62" width="1" height="7"/><rect x="67" y="62" width="1.6" height="7"/><rect x="70.5" y="62" width="1" height="7"/><rect x="72.8" y="62" width="1.4" height="7"/></g>
+          </svg></span>
+        </span>
+        <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
+        <span class="tag">Numri i radhës</span>
+      </button>
+
+      <button type="button" class="exhibit rv" style="--d:2" data-i="8" aria-expanded="false" aria-controls="museum-card">
+        <span class="objbox">
+          <span class="beam" style="--d:8" aria-hidden="true"><span></span></span><span class="pool" style="--d:8" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <path d="M46 88 L52 74 M74 88 L68 74" stroke="#1d1b19" stroke-width="2.2" stroke-linecap="round"/>
+            <g transform="rotate(-3 60 88)">
+              <rect x="32" y="8" width="56" height="78" rx="3" fill="#7b6a55"/>
+              <rect x="37" y="16" width="46" height="66" fill="#f8f5ee"/>
+              <rect x="50" y="4" width="20" height="9" rx="2" fill="url(#g-metal)"/>
+              <rect x="54" y="2" width="12" height="4" rx="2" fill="#9a9ca0"/>
+              <g fill="#bdb6a8">
+                <rect x="41" y="23" width="38" height="1.2"/><rect x="41" y="29" width="38" height="1.2"/><rect x="41" y="35" width="38" height="1.2"/>
+                <rect x="41" y="41" width="38" height="1.2"/><rect x="41" y="47" width="38" height="1.2"/><rect x="41" y="53" width="38" height="1.2"/>
+                <rect x="41" y="59" width="38" height="1.2"/><rect x="41" y="65" width="38" height="1.2"/><rect x="41" y="71" width="38" height="1.2"/>
+              </g>
+              <g fill="#e6a84a" opacity=".55">
+                <rect x="40" y="33" width="40" height="4.4"/><rect x="40" y="51" width="40" height="4.4"/><rect x="40" y="63" width="40" height="4.4"/>
+              </g>
+            </g>
+          </svg></span>
+        </span>
+        <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
+        <span class="tag">Lista e pagave</span>
+      </button>
+
+      <button type="button" class="exhibit rv" style="--d:3" data-i="9" aria-expanded="false" aria-controls="museum-card">
+        <span class="objbox">
+          <span class="beam" style="--d:9" aria-hidden="true"><span></span></span><span class="pool" style="--d:9" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <ellipse cx="60" cy="84" rx="44" ry="5" fill="#8f6d18"/>
+            <ellipse cx="60" cy="82.4" rx="44" ry="5" fill="url(#g-hat)"/>
+            <path d="M28 80 C28 52 42 36 60 36 C78 36 92 52 92 80 Z" fill="url(#g-hat)"/>
+            <path d="M56 37 L56 80 L64 80 L64 37 C62 36.4 58 36.4 56 37 Z" fill="#c99d2e"/>
+            <path d="M56 37 L56 80" stroke="#8f6d18" stroke-width=".8" opacity=".6"/>
+            <path d="M64 37 L64 80" stroke="#f3d77d" stroke-width=".8" opacity=".6"/>
+            <path d="M28 80 C40 76 80 76 92 80" fill="none" stroke="#8f6d18" stroke-width="1.2"/>
+            <g fill="#6b5a3a" opacity=".35"><circle cx="40" cy="64" r="1.2"/><circle cx="76" cy="58" r=".9"/><circle cx="46" cy="72" r=".8"/><circle cx="82" cy="70" r="1.3"/></g>
+          </svg></span>
+        </span>
+        <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
+        <span class="tag">Kaska e ndërtimit</span>
+      </button>
+
+      <button type="button" class="exhibit rv" style="--d:4" data-i="10" aria-expanded="false" aria-controls="museum-card">
+        <span class="objbox">
+          <span class="beam" style="--d:10" aria-hidden="true"><span></span></span><span class="pool" style="--d:10" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <path d="M14 82 C26 76 32 88 46 82 S64 74 72 84" fill="none" stroke="#9d2b24" stroke-width="6"/>
+            <path d="M80 82 C88 78 96 88 108 80" fill="none" stroke="#9d2b24" stroke-width="6"/>
+            <path d="M14 80.6 C26 74.6 32 86.6 46 80.6" fill="none" stroke="#c4473d" stroke-width="1.2" opacity=".7"/>
+            <path d="M58 52 L104 16 L107 20 Z" fill="url(#g-metal)"/>
+            <path d="M58 52 L100 12 L104 16 Z" fill="#c9cbcf"/>
+            <path d="M62 50 L106 30 L104 35 Z" fill="url(#g-metal)"/>
+            <circle cx="60" cy="51" r="2.4" fill="#3c3d41"/>
+            <path d="M58 53 L42 63" stroke="#2a2b2e" stroke-width="5" stroke-linecap="round"/>
+            <path d="M60 54 L52 70" stroke="#2a2b2e" stroke-width="5" stroke-linecap="round"/>
+            <ellipse cx="34" cy="67" rx="10" ry="7" fill="none" stroke="#2a2b2e" stroke-width="4.4" transform="rotate(-30 34 67)"/>
+            <ellipse cx="49" cy="77" rx="7" ry="9" fill="none" stroke="#2a2b2e" stroke-width="4.4" transform="rotate(-20 49 77)"/>
+          </svg></span>
+        </span>
+        <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
+        <span class="tag">Gërshërët</span>
+      </button>
+
+      <button type="button" class="exhibit rv" style="--d:5" data-i="11" aria-expanded="false" aria-controls="museum-card">
+        <span class="objbox">
+          <span class="beam" style="--d:11" aria-hidden="true"><span></span></span><span class="pool" style="--d:11" aria-hidden="true"></span>
+          <span class="obj"><svg viewBox="0 0 120 90" aria-hidden="true">
+            <path d="M33 31 C40 36 46 42 52 49" fill="none" stroke="#7b6a55" stroke-width="1"/>
+            <g transform="rotate(-8 30 28)">
+              <rect x="12" y="20" width="26" height="16" rx="2" fill="#d9cba9"/>
+              <circle cx="33" cy="28" r="2" fill="none" stroke="#9c8a63" stroke-width="1"/>
+              <rect x="16" y="25" width="12" height="1.2" fill="#8f7f5f"/>
+              <rect x="16" y="29" width="8" height="1.2" fill="#a89878"/>
+            </g>
+            <g transform="rotate(32 70 62)">
+              <circle cx="48" cy="62" r="11" fill="none" stroke="url(#g-brass)" stroke-width="5"/>
+              <rect x="58" y="59.5" width="48" height="5" rx="1.5" fill="url(#g-brass)"/>
+              <path d="M92 64.5 L92 73 L97 73 L97 69 L101 69 L101 73 L106 73 L106 64.5 Z" fill="url(#g-brass)"/>
+              <circle cx="48" cy="62" r="8.4" fill="none" stroke="#f0d79a" stroke-width=".7" opacity=".5"/>
+            </g>
+          </svg></span>
+        </span>
+        <span class="plinth" aria-hidden="true"><span class="contact"></span></span>
+        <span class="tag">Çelësi i zyrës</span>
+      </button>
+
     </div>
   </div>
 </section>
@@ -1135,40 +1169,41 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
 <!-- 2. Telefoni kundër Korrupsionit -->
 <section id="telefoni" class="scene phone-scene" data-sec="telefoni" aria-labelledby="telefoni-title">
   <div class="wrap">
-    <h2 id="telefoni-title" class="eyebrow rv"><span class="n" aria-hidden="true">02</span>Telefoni kundër Korrupsionit</h2>
+    <header class="sec-head rv">
+      <span class="sh-l"><span class="glyph g-ci" aria-hidden="true"></span><span class="sh-num" aria-hidden="true">02</span><h2 id="telefoni-title">Telefoni kundër Korrupsionit</h2></span>
+      <span class="sh-word">Dëgjo.</span>
+    </header>
 
     <div class="phone-stage" id="phone-stage">
       <div class="rig-col">
         <div class="rig">
+          <span class="beam fade" aria-hidden="true"><span></span></span>
           <span class="pole" aria-hidden="true"></span>
-          <div class="sign-hang">
-            <div class="arm" aria-hidden="true"></div>
-            <div class="chains" aria-hidden="true"><i></i><i></i></div>
-            <div class="sign">
-              <h3>Ngrije receptorin.</h3>
-              <p>Dikush ka diçka për të të thënë.</p>
-            </div>
+          <div class="plaque label rv" style="--d:1">
+            <h3>Ngrije receptorin.</h3>
+            <p>Dikush ka diçka për të të thënë.</p>
           </div>
 
           <div class="phone" id="phone">
-            <span class="mount" aria-hidden="true"></span>
+            <span class="bracket" aria-hidden="true"></span>
             <svg class="body-svg" viewBox="0 0 220 140" aria-hidden="true">
-              <rect x="20" y="2" width="28" height="16" rx="6" fill="#6f2e24"/>
-              <rect x="172" y="2" width="28" height="16" rx="6" fill="#6f2e24"/>
-              <path d="M22 138 L198 138 Q214 138 211 122 L194 30 Q191 14 175 14 L45 14 Q29 14 26 30 L9 122 Q6 138 22 138 Z" fill="url(#g-phone)"/>
-              <path d="M45 16 L175 16 Q188 16 191 28" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
-              <path d="M14 132 L206 132" stroke="#000" stroke-opacity=".18" stroke-width="2"/>
-              <circle cx="110" cy="80" r="39" fill="#e9dfc8"/>
-              <circle cx="110" cy="80" r="39" fill="none" stroke="#000" stroke-opacity=".12" stroke-width="1.5"/>
-              <g fill="#3a2a24">
-                <circle cx="137.5" cy="80" r="5.4"/><circle cx="132.2" cy="96.2" r="5.4"/><circle cx="118.5" cy="106.2" r="5.4"/>
-                <circle cx="101.5" cy="106.2" r="5.4"/><circle cx="87.8" cy="96.2" r="5.4"/><circle cx="82.5" cy="80" r="5.4"/>
-                <circle cx="87.8" cy="63.8" r="5.4"/><circle cx="101.5" cy="53.8" r="5.4"/><circle cx="118.5" cy="53.8" r="5.4"/>
-                <circle cx="132.2" cy="63.8" r="5.4"/>
+              <rect x="22" y="4" width="26" height="14" rx="3" fill="#2b2c30"/>
+              <rect x="172" y="4" width="26" height="14" rx="3" fill="#2b2c30"/>
+              <path d="M18 134 L202 134 Q211 134 209 125 L192 26 Q190 16 180 16 L40 16 Q30 16 28 26 L11 125 Q9 134 18 134 Z" fill="url(#g-phone)"/>
+              <path d="M40 17.5 L180 17.5" stroke="#fff" stroke-opacity=".7" stroke-width="1"/>
+              <rect x="12" y="133" width="196" height="6" rx="1.5" fill="#1d1e21"/>
+              <circle cx="110" cy="76" r="38" fill="#2b2c30"/>
+              <circle cx="110" cy="76" r="36.5" fill="none" stroke="#3a3b40" stroke-width="1"/>
+              <g fill="#d9d2c3">
+                <circle cx="137" cy="76" r="5"/><circle cx="131.8" cy="91.9" r="5"/><circle cx="118.3" cy="101.7" r="5"/>
+                <circle cx="101.7" cy="101.7" r="5"/><circle cx="88.2" cy="91.9" r="5"/><circle cx="83" cy="76" r="5"/>
+                <circle cx="88.2" cy="60.1" r="5"/><circle cx="101.7" cy="50.3" r="5"/><circle cx="118.3" cy="50.3" r="5"/>
+                <circle cx="131.8" cy="60.1" r="5"/>
               </g>
-              <circle cx="110" cy="80" r="13" fill="#f6efdf" stroke="#c9bea5" stroke-width="1"/>
-              <path d="M104 78 h12 M104 82 h8" stroke="#b5aa92" stroke-width="1.2" stroke-linecap="round"/>
-              <path d="M146 100 q6 2 6 9" fill="none" stroke="#c9bea5" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="110" cy="76" r="12" fill="#ece6da"/>
+              <circle cx="110" cy="76" r="2.2" fill="#2b2c30"/>
+              <path d="M144 96 q5 2 5 8" fill="none" stroke="#8f8a82" stroke-width="2" stroke-linecap="round"/>
+              <circle class="led" cx="184" cy="118" r="3"/>
             </svg>
             <span class="cord" aria-hidden="true">
               <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i>
@@ -1179,14 +1214,13 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
             <button type="button" class="handset" id="handset" aria-label="Ngrije receptorin." aria-expanded="false" aria-controls="phone-panel">
               <span class="handset-inner">
                 <svg viewBox="0 0 232 60" aria-hidden="true">
-                  <ellipse cx="29" cy="47" rx="23" ry="6" fill="#6c2a21"/>
-                  <ellipse cx="203" cy="47" rx="23" ry="6" fill="#6c2a21"/>
+                  <ellipse cx="29" cy="47" rx="23" ry="5.4" fill="#2b2c30"/>
+                  <ellipse cx="203" cy="47" rx="23" ry="5.4" fill="#2b2c30"/>
                   <path d="M8 46 Q2 46 4 38 L14 20 Q22 8 40 8 L192 8 Q210 8 218 20 L228 38 Q230 46 224 46 L182 46 Q174 46 172 38 L168 30 Q166 26 160 26 L72 26 Q66 26 64 30 L60 38 Q58 46 50 46 Z" fill="url(#g-handset)"/>
-                  <path d="M20 19 Q27 11 40 11 L192 11 Q205 11 212 19" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="2.2" stroke-linecap="round"/>
+                  <path d="M22 17 Q29 10.5 40 10.5 L192 10.5 Q203 10.5 210 17" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="1.2" stroke-linecap="round"/>
                 </svg>
               </span>
             </button>
-            <span class="waves" aria-hidden="true"><i></i><i></i></span>
           </div>
         </div>
       </div>
@@ -1195,9 +1229,10 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
         <div class="panel-clip">
           <div class="panel-pad">
             <div class="panel" id="phone-panel" inert>
-              <div class="display" aria-hidden="true">
-                <span class="disp-num" id="disp-num"></span>
-                <p class="tw"><span id="tw-text"></span><span class="caret"></span></p>
+              <div class="display">
+                <span class="disp-num" id="disp-num" aria-hidden="true"></span>
+                <p class="tw" aria-hidden="true"><span id="tw-text"></span><span class="caret"></span></p>
+                <div class="disp-foot"><button type="button" class="xref" id="tw-xref" hidden></button></div>
               </div>
               <p class="sr-only" id="tw-live" aria-live="polite"></p>
               <div class="keypad" id="keypad" role="group" aria-label="Tastiera">
@@ -1206,7 +1241,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
                 <button type="button" class="key">7</button><button type="button" class="key">8</button><button type="button" class="key">9</button>
               </div>
               <p class="note"><em>Dëshmitë janë shembuj të rindërtuar për këtë prezantim.</em></p>
-              <div class="report" id="report">
+              <div class="report label" id="report">
                 <strong>Ke parë korrupsion? Raportoje falas te Agjencia për Parandalimin e Korrupsionit: <a href="tel:080010800">0800 10 800</a>. Mund ta bësh edhe pa e thënë emrin.</strong>
               </div>
               <button type="button" class="close-btn" id="phone-close">Mbyll</button>
@@ -1219,61 +1254,43 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
 </section>
 
 <!-- 3. Çadrat e Mbrojtjes -->
-<section id="cadrat" class="scene umbrellas" data-sec="cadrat" aria-labelledby="cadrat-title">
-  <span class="cloud c1" aria-hidden="true"></span>
-  <span class="cloud c2" aria-hidden="true"></span>
-  <span class="cloud c3" aria-hidden="true"></span>
+<section id="cadrat" class="scene umbrellas on-light" data-sec="cadrat" aria-labelledby="cadrat-title">
   <div class="wrap">
-    <h2 id="cadrat-title" class="eyebrow rv"><span class="n" aria-hidden="true">03</span>Çadrat e Mbrojtjes</h2>
-    <p class="umb-head rv" style="--d:1">Ecni nën mbrojtjen e ligjit.</p>
+    <header class="sec-head rv">
+      <span class="sh-l"><span class="glyph g-dome" aria-hidden="true"></span><span class="sh-num" aria-hidden="true">03</span><h2 id="cadrat-title">Çadrat e Mbrojtjes</h2></span>
+      <span class="sh-word">Mbrohu.</span>
+    </header>
+    <p class="statement umb-head rv" style="--d:1">Ecni nën mbrojtjen e ligjit.</p>
     <ol class="umb-grid" id="umb-grid"></ol>
     <p class="umb-foot rv" style="--d:4"><em>Mbrojtja vlen kur raporton sipas <span class="nw">Ligjit Nr. 06/L-085</span>.</em></p>
   </div>
 </section>
 
 <!-- 4. Outro -->
-<section id="fundi" class="scene outro" data-sec="fundi" aria-labelledby="fundi-title">
+<section id="fundi" class="scene outro on-light" data-sec="fundi" aria-labelledby="fundi-title">
   <div class="wrap">
-    <div class="outro-motifs" aria-hidden="true">
-      <span class="om m-see" style="--from:-60px">
-        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 4h8M24 4l-11 22M24 4l11 22" opacity=".45"/>
-          <rect x="16" y="20" width="16" height="10" rx="1"/><path d="M16 21l8 5 8-5"/>
-          <path d="M13 32h22v12H13z"/>
-        </svg>
-      </span>
-      <span class="om m-hear" style="--from:0px">
-        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 18c-3-6 1-10 5-11l4 7-4 3c1 5 6 11 11 13l3-4 7 4c-1 4-5 8-11 5C15 33 11 26 9 18z"/>
-          <path d="M33 10c3 1 5 3 6 6M33 4c6 1 10 5 11 11" opacity=".55"/>
-        </svg>
-      </span>
-      <span class="om m-safe" style="--from:60px">
-        <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 24C4 13 13 6 24 6s20 7 20 18c-2.5-2.5-5.5-2.5-8 0-2.5-2.5-5.5-2.5-8 0-1.3-1.3-2.7-2-4-2s-2.7.7-4 2c-2.5-2.5-5.5-2.5-8 0-2.5-2.5-5.5-2.5-8 0z"/>
-          <path d="M24 22v17c0 4-6 4-6 0"/>
-        </svg>
-      </span>
+    <div class="outro-marks" aria-hidden="true">
+      <span class="glyph g-sq om" style="--from:-48px"></span>
+      <span class="glyph g-ci om" style="--from:0px"></span>
+      <span class="glyph g-dome om" style="--from:48px"></span>
     </div>
     <h2 id="fundi-title" class="rv" style="--d:2"><span class="nw">Ligji Nr. 06/L-085</span> për Mbrojtjen e Sinjalizuesve</h2>
     <p class="outro-call rv" style="--d:4">Raporto falas: <a href="tel:080010800">0800 10 800</a></p>
-    <ul class="confetti" id="confetti" aria-hidden="true"></ul>
   </div>
 </section>
 
 </main>
 
-<!-- Full museum label (slides in) -->
-<aside class="museum-card" id="museum-card" aria-live="polite">
-  <h3 id="mc-title"></h3>
+<aside class="museum-card label" id="museum-card" aria-live="polite">
+  <div class="mc-top">
+    <h3 id="mc-title"></h3>
+    <button type="button" class="xref" id="mc-xref" hidden></button>
+  </div>
   <p class="mc-text" id="mc-text"></p>
   <p class="mc-period"><em>Periudha: ende në përdorim</em></p>
 </aside>
 
-<!-- Phone-size reading card for a flipped umbrella -->
-<div class="umb-overlay" id="umb-overlay" aria-hidden="true">
-  <div class="ov-card" id="ov-card"></div>
-</div>
+<div class="umb-overlay" id="umb-overlay" aria-hidden="true"><div class="ov-card" id="ov-card"></div></div>
 <p class="sr-only" id="umb-live" aria-live="polite"></p>
 
 <script>
@@ -1285,7 +1302,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
 
-  /* ---------------- Scenes: reveal on scroll + progress dots ---------------- */
+  /* ---------------- Scenes: reveal on scroll + progress marks ---------------- */
   var scenes = $$('.scene');
   var dotLinks = $$('.dots a');
   var flashTimer = null;
@@ -1327,13 +1344,33 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     try { window.scrollBy({ top: dy, behavior: reduced() ? 'auto' : 'smooth' }); }
     catch (err) { window.scrollBy(0, dy); }
   }
+  // scroll an element into view, then run cb once the scroll has settled
+  function goTo(el, block, cb) {
+    var done = false;
+    function fin() { if (done) return; done = true; window.removeEventListener('scrollend', fin); cb(); }
+    try { el.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: block }); }
+    catch (err) { el.scrollIntoView(); }
+    if (reduced()) { requestAnimationFrame(fin); return; }
+    if ('onscrollend' in window) window.addEventListener('scrollend', fin);
+    setTimeout(fin, 1100);
+  }
+  function glyph(kind) { return '<span class="glyph g-' + kind + '" aria-hidden="true"></span>'; }
 
   /* ---------------- 1. Muzeu ---------------- */
+  // tm: the phone testimony (0-based) told about this object, or -1
   var EXHIBITS = [
-    { t: 'Zarfi', d: 'Dorëzuar nën tavolinë për të “shpejtuar” një leje. Përmbajtja nuk u numërua kurrë në asnjë raport.' },
-    { t: 'Diploma', d: 'Lëshuar nga një universitet që askush nuk e ka vizituar. Ka hapur dyert e një zyre publike.' },
-    { t: 'Thesi i miellit', d: 'Shpërndarë dy javë para zgjedhjeve. Pas votimit thesi u zbraz, premtimet po ashtu.' },
-    { t: 'Tulla e çarë', d: 'Nga një rrugë e re, e përuruar me shirit të kuq në shtator. U ça para dimrit të parë.' }
+    { t: 'Zarfi', tm: 5, d: 'Dorëzuar nën tavolinë për të “shpejtuar” një leje. Përmbajtja nuk u numërua kurrë në asnjë raport.' },
+    { t: 'Diploma', tm: 4, d: 'Lëshuar nga një universitet që askush nuk e ka vizituar. Ka hapur dyert e një zyre publike.' },
+    { t: 'Thesi i miellit', tm: 2, d: 'Shpërndarë dy javë para zgjedhjeve. Pas votimit thesi u zbraz, premtimet po ashtu.' },
+    { t: 'Tulla e çarë', tm: 3, d: 'Nga një rrugë e re, e përuruar me shirit të kuq në shtator. U ça para dimrit të parë.' },
+    { t: 'Filxhani i kafesë', tm: 0, d: '“Diçka për kafe” nuk ishte kurrë kafe. Ishte çmimi i një vendi pune në administratë.' },
+    { t: 'Dosja e tenderit', tm: 1, d: 'Oferta fituese për një urë të re. Firma kishte vulë, adresë dhe llogari bankare, por asnjë punëtor.' },
+    { t: 'Vula', tm: -1, d: 'Vuloste brenda ditës, por vetëm për ata që e dinin çmimin. Të tjerët prisnin me javë të tëra.' },
+    { t: 'Numri i radhës', tm: 6, d: 'Marrë në orën shtatë të mëngjesit. Nuk u thirr kurrë: radha e vërtetë kalonte nga dera e pasme.' },
+    { t: 'Lista e pagave', tm: -1, d: 'Tre emra në këtë listë morën pagë për dy vjet. Askush nuk i pa kurrë në punë.' },
+    { t: 'Kaska e ndërtimit', tm: -1, d: 'Nga kantieri i një shkolle që u pagua dy herë. Shkolla ende pret të hidhen themelet.' },
+    { t: 'Gërshërët', tm: -1, d: 'Përdorur në çdo përurim para zgjedhjeve. Asnjë nga projektet nuk u përfundua.' },
+    { t: 'Çelësi i zyrës', tm: 7, d: 'Dhënë një punonjësi pasi e raportoi shefin. Zyra e re nuk kishte dritare, as punë.' }
   ];
   var museum = $('#muzeu');
   var gallery = $('#gallery');
@@ -1341,6 +1378,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
   var mCard = $('#museum-card');
   var mTitle = $('#mc-title');
   var mText = $('#mc-text');
+  var mXref = $('#mc-xref');
   var activeEx = null;
 
   function openExhibit(btn) {
@@ -1352,13 +1390,20 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     gallery.classList.add('has-active');
     mTitle.textContent = data.t;
     mText.textContent = data.d;
+    if (data.tm > -1) {
+      mXref.hidden = false;
+      mXref.innerHTML = glyph('ci') + '<span>Dëgjo</span><span class="xn">' + (data.tm + 1) + '</span>';
+      mXref.setAttribute('aria-label', 'Dëgjo dëshminë ' + (data.tm + 1));
+      mXref.setAttribute('data-t', data.tm);
+    } else {
+      mXref.hidden = true;
+    }
     mCard.classList.add('show');
-    // keep the lifted object clear of the label card
     requestAnimationFrame(function () {
       var r = btn.getBoundingClientRect();
       var cardH = mCard.offsetHeight + 28;
       var limit = window.innerHeight - cardH;
-      var top = r.top - r.height * 0.3;
+      var top = r.top - r.height * 0.35;
       var dy = 0;
       if (r.bottom > limit) dy = r.bottom - limit;
       if (top - dy < 12) dy = top - 12;
@@ -1374,9 +1419,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     mCard.classList.remove('show');
   }
   exhibits.forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      if (activeEx === btn) closeExhibit(); else openExhibit(btn);
-    });
+    btn.addEventListener('click', function () { if (activeEx === btn) closeExhibit(); else openExhibit(btn); });
   });
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (entries) {
@@ -1396,6 +1439,11 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     'E raportova dhe më transferuan në një zyrë pa dritare.',
     'Heshta për vite. Tani e di që ligji më mbron.'
   ];
+  // testimony → the museum object that carries it (the last one leads to the umbrellas)
+  var T2EX = TESTIMONIES.map(function (_, t) {
+    for (var i = 0; i < EXHIBITS.length; i++) if (EXHIBITS[i].tm === t) return i;
+    return -1;
+  });
   var stage = $('#phone-stage');
   var phone = $('#phone');
   var handset = $('#handset');
@@ -1403,6 +1451,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
   var keys = $$('.key', panel);
   var twText = $('#tw-text');
   var twLive = $('#tw-live');
+  var twXref = $('#tw-xref');
   var dispNum = $('#disp-num');
   var report = $('#report');
   var closeBtn = $('#phone-close');
@@ -1412,13 +1461,13 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
   var heard = {};
   var heardCount = 0;
 
-  function lift(fromKeyboard) {
+  function lift(fromKeyboard, then) {
     if (lifted) {
-      // already up: replay the little wobble
       var inner = $('.handset-inner', handset);
       inner.style.animation = 'none';
       void inner.offsetWidth;
       inner.style.animation = '';
+      if (then) then();
       return;
     }
     lifted = true;
@@ -1427,14 +1476,13 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     handset.setAttribute('aria-expanded', 'true');
     panel.inert = false;
     panel.removeAttribute('inert');
-    if (fromKeyboard) {
-      setTimeout(function () { keys[0].focus({ preventScroll: true }); }, reduced() ? 0 : 250);
-    }
-    // on narrow screens the keypad opens below the phone: bring it into view
+    if (fromKeyboard) setTimeout(function () { keys[0].focus({ preventScroll: true }); }, reduced() ? 0 : 250);
     setTimeout(function () {
-      if (!lifted || window.innerWidth >= 900) return;
-      var r = panel.getBoundingClientRect();
-      if (r.top > window.innerHeight * 0.62) scrollByY(r.top - window.innerHeight * 0.42);
+      if (lifted && window.innerWidth < 900) {
+        var r = panel.getBoundingClientRect();
+        if (r.top > window.innerHeight * 0.62) scrollByY(r.top - window.innerHeight * 0.42);
+      }
+      if (then) then();
     }, reduced() ? 30 : 700);
   }
   function hangUp() {
@@ -1449,9 +1497,23 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     panel.setAttribute('inert', '');
     if (hadFocus) handset.focus({ preventScroll: true });
   }
+  function showXref(t) {
+    var ex = T2EX[t];
+    if (ex > -1) {
+      twXref.innerHTML = glyph('sq') + '<span>' + EXHIBITS[ex].t + '</span>';
+      twXref.setAttribute('data-go', 'ex:' + ex);
+    } else {
+      twXref.innerHTML = glyph('dome') + '<span>Çadrat</span>';
+      twXref.setAttribute('data-go', 'umb');
+    }
+    twXref.hidden = false;
+    requestAnimationFrame(function () { twXref.classList.add('on'); });
+  }
+  function hideXref() { twXref.classList.remove('on'); twXref.hidden = true; }
   function markHeard(i) {
     var k = keys[i];
     k.classList.remove('playing');
+    showXref(i);
     if (heard[i]) return;
     heard[i] = true;
     heardCount++;
@@ -1466,13 +1528,15 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
   function stopTyping(complete) {
     if (timer) { clearTimeout(timer); timer = null; }
     if (playing > -1) {
-      if (complete) twText.textContent = TESTIMONIES[playing];
-      markHeard(playing);
+      var p = playing;
       playing = -1;
+      if (complete) twText.textContent = TESTIMONIES[p];
+      markHeard(p);
     }
   }
   function play(i) {
     stopTyping(false);
+    hideXref();
     playing = i;
     var text = TESTIMONIES[i];
     keys.forEach(function (k) { k.classList.remove('playing'); });
@@ -1480,26 +1544,34 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     dispNum.textContent = String(i + 1);
     dispNum.classList.add('on');
     twLive.textContent = text;
-    if (reduced()) {
-      twText.textContent = text;
-      markHeard(i);
-      playing = -1;
-      return;
-    }
+    if (reduced()) { twText.textContent = text; playing = -1; markHeard(i); return; }
     var n = 0;
     twText.textContent = '';
     (function step() {
       n++;
       twText.textContent = text.slice(0, n);
-      if (n >= text.length) { timer = null; markHeard(i); playing = -1; return; }
-      var ch = text.charAt(n - 1);
-      timer = setTimeout(step, /[.,]/.test(ch) ? 220 : 30);
+      if (n >= text.length) { timer = null; playing = -1; markHeard(i); return; }
+      timer = setTimeout(step, /[.,:]/.test(text.charAt(n - 1)) ? 220 : 30);
     })();
   }
 
   handset.addEventListener('click', function (e) { lift(e.detail === 0); });
   closeBtn.addEventListener('click', hangUp);
   keys.forEach(function (k, i) { k.addEventListener('click', function () { if (lifted) play(i); }); });
+
+  /* ---------------- Cross-links between the rooms ---------------- */
+  mXref.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var t = +mXref.getAttribute('data-t');
+    closeExhibit();
+    goTo(stage, 'center', function () { lift(false, function () { play(t); }); });
+  });
+  twXref.addEventListener('click', function () {
+    var go = twXref.getAttribute('data-go');
+    if (go === 'umb') { goTo($('#cadrat'), 'start', function () {}); return; }
+    var btn = exhibits[+go.split(':')[1]];
+    goTo(btn, 'center', function () { openExhibit(btn); btn.focus({ preventScroll: true }); });
+  });
 
   /* ---------------- 3. Çadrat ---------------- */
   var UMBRELLAS = [
@@ -1519,75 +1591,64 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     ['Ke të drejtë ta mësosh rezultatin.', 'Neni 18.7'],
     ['Mbrohet edhe zyrtari që e pranon raportin.', 'Neni 8.3']
   ];
-  // one bright colour each; neighbours (across and down) never share a family
-  var COLORS = ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e', '#d946ef',
-                '#facc15', '#6366f1', '#f97316', '#14b8a6', '#ec4899',
-                '#84cc16', '#06b6d4', '#8b5cf6', '#e11d48', '#0ea5e9'];
+  // 15 hues at one lightness and chroma (OKLCH 0.66 / 0.145), so they read as one family
+  var COLORS = ['#dd6a64', '#00adaa', '#d8688d', '#00ae83', '#c96cb2',
+                '#51a957', '#b175d1', '#869f25', '#9181e4', '#ac9100',
+                '#668eeb', '#c78100', '#209be2', '#d77337', '#00a6cb'];
 
   function hexToRgb(h) { var n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
   function toHex(c) { return '#' + c.map(function (v) { v = Math.max(0, Math.min(255, Math.round(v))); return (v < 16 ? '0' : '') + v.toString(16); }).join(''); }
   function mix(h, target, t) { var a = hexToRgb(h), b = hexToRgb(target); return toHex(a.map(function (v, k) { return v + (b[k] - v) * t; })); }
-  function lum(h) {
-    var c = hexToRgb(h).map(function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
-    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-  }
 
-  var NS = 'http://www.w3.org/2000/svg';
   var RIBS = 8, R = 47;
   function pt(a, r) { return [(r * Math.cos(a)).toFixed(2), (r * Math.sin(a)).toFixed(2)]; }
   function ribAngle(k) { return (22.5 + k * 45) * Math.PI / 180; }
-  function outlinePath() {
+  var OUTLINE = (function () {
     var d = '';
     for (var k = 0; k < RIBS; k++) {
-      var p0 = pt(ribAngle(k), R), p1 = pt(ribAngle(k + 1), R), c = pt(ribAngle(k) + Math.PI / 8, R * 0.8);
+      var p0 = pt(ribAngle(k), R), p1 = pt(ribAngle(k + 1), R), c = pt(ribAngle(k) + Math.PI / 8, R * 0.82);
       d += (k === 0 ? 'M' + p0.join(' ') : '') + ' Q' + c.join(' ') + ' ' + p1.join(' ');
     }
     return d + ' Z';
-  }
-  var OUTLINE = outlinePath();
+  })();
 
   function frontSVG(c) {
-    var dark = mix(c, '#000000', 0.16);
+    var shade = mix(c, '#000000', 0.12);
     var s = '<svg viewBox="-50 -50 100 100" aria-hidden="true" focusable="false">';
     for (var k = 0; k < RIBS; k++) {
-      var p0 = pt(ribAngle(k), R), p1 = pt(ribAngle(k + 1), R), cc = pt(ribAngle(k) + Math.PI / 8, R * 0.8);
-      s += '<path d="M0 0 L' + p0.join(' ') + ' Q' + cc.join(' ') + ' ' + p1.join(' ') + ' Z" fill="' + (k % 2 ? dark : c) + '"/>';
+      var p0 = pt(ribAngle(k), R), p1 = pt(ribAngle(k + 1), R), cc = pt(ribAngle(k) + Math.PI / 8, R * 0.82);
+      s += '<path d="M0 0 L' + p0.join(' ') + ' Q' + cc.join(' ') + ' ' + p1.join(' ') + ' Z" fill="' + (k % 2 ? shade : c) + '"/>';
     }
     s += '<path d="' + OUTLINE + '" fill="url(#g-canopy)"/>';
     for (var j = 0; j < RIBS; j++) {
       var t = pt(ribAngle(j), R);
-      s += '<path d="M0 0 L' + t.join(' ') + '" stroke="#000" stroke-opacity=".18" stroke-width=".9"/>';
-      s += '<circle cx="' + t[0] + '" cy="' + t[1] + '" r="1.5" fill="#2a2a2a"/>';
+      s += '<path d="M0 0 L' + t.join(' ') + '" stroke="#000" stroke-opacity=".14" stroke-width=".6"/>';
+      s += '<circle cx="' + t[0] + '" cy="' + t[1] + '" r=".9" fill="#1a1b1e"/>';
     }
-    s += '<circle r="5.6" fill="' + mix(c, '#000000', 0.38) + '"/><circle r="3.1" fill="#2b2b2b"/>';
-    s += '<path d="M.5 2.5 C.5 10 1 15 5 17 C9 19 12.5 16 11.5 12.5" fill="none" stroke="#6b4426" stroke-width="3.4" stroke-linecap="round"/>';
-    s += '<path d="M.5 2.5 C.5 10 1 15 5 17" fill="none" stroke="#a87443" stroke-width="1.1" stroke-linecap="round"/>';
+    s += '<circle r="4.8" fill="' + mix(c, '#000000', 0.3) + '"/><circle r="2.6" fill="#1a1b1e"/>';
     return s + '</svg>';
   }
   function backSVG(c) {
     var s = '<svg viewBox="-50 -50 100 100" aria-hidden="true" focusable="false">';
-    s += '<path d="' + OUTLINE + '" fill="' + mix(c, '#ffffff', 0.84) + '" stroke="' + c + '" stroke-width="3.4" stroke-linejoin="round"/>';
+    s += '<path d="' + OUTLINE + '" fill="#f4f1ea" stroke="' + c + '" stroke-width="2.4" stroke-linejoin="round"/>';
     for (var j = 0; j < RIBS; j++) {
       var t = pt(ribAngle(j), R - 3);
-      s += '<path d="M0 0 L' + t.join(' ') + '" stroke="' + c + '" stroke-opacity=".16" stroke-width=".8"/>';
+      s += '<path d="M0 0 L' + t.join(' ') + '" stroke="' + c + '" stroke-opacity=".14" stroke-width=".6"/>';
     }
     return s + '</svg>';
   }
-  function fontScale(msg) { return msg.length <= 22 ? 11 : msg.length <= 38 ? 9 : 8; }
+  function fontScale(msg) { return msg.length <= 22 ? 10.5 : msg.length <= 38 ? 8.8 : 7.8; }
 
   var grid = $('#umb-grid');
   var umbs = [];
   UMBRELLAS.forEach(function (u, i) {
     var c = COLORS[i];
-    var row = Math.floor(i / 5), col = i % 5;
-    var ink2 = mix(c, '#000000', 0.5);
     var li = document.createElement('li');
     li.className = 'umb';
-    li.style.setProperty('--w', row + col);
-    li.style.setProperty('--sd', (4.6 + (i * 0.37) % 2.6).toFixed(2) + 's');
+    li.style.setProperty('--w', Math.floor(i / 5) + (i % 5));
+    li.style.setProperty('--sd', (5.2 + (i * 0.37) % 2.6).toFixed(2) + 's');
     li.style.setProperty('--sdl', (-((i * 0.73) % 4)).toFixed(2) + 's');
-    li.style.setProperty('--num-ink', lum(c) > 0.42 ? '#1b2a3a' : '#ffffff');
-    li.style.setProperty('--ink2', ink2);
+    li.style.setProperty('--ink2', mix(c, '#000000', 0.45));
     li.style.setProperty('--fs', fontScale(u[0]));
     li.innerHTML =
       '<button type="button" class="umb-btn" aria-pressed="false">' +
@@ -1626,7 +1687,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     clearTimeout(dockTimer);
     featured = i;
     ovCard.style.setProperty('--fs', fontScale(data[0]));
-    ovCard.style.setProperty('--ink2', mix(u.color, '#000000', 0.5));
+    ovCard.style.setProperty('--ink2', mix(u.color, '#000000', 0.45));
     ovCard.innerHTML = backSVG(u.color) + '<span class="ov-txt"><span class="msg"></span><span class="art"></span></span>';
     $('.msg', ovCard).textContent = data[0];
     $('.art', ovCard).textContent = data[1];
@@ -1636,7 +1697,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     ovCard.style.transform = cellTransform(i);
     ovCard.style.opacity = '0';
     void ovCard.offsetWidth;
-    ovCard.style.transition = 'transform .65s cubic-bezier(.2,.9,.25,1.04), opacity .25s';
+    ovCard.style.transition = 'transform .75s cubic-bezier(.2,.7,.1,1), opacity .3s';
     ovCard.style.transform = 'none';
     ovCard.style.opacity = '1';
   }
@@ -1645,11 +1706,11 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     var i = featured;
     featured = -1;
     if (reduced()) { overlay.classList.remove('show'); return; }
-    ovCard.style.transition = 'transform .45s cubic-bezier(.4,0,.2,1), opacity .2s .25s';
+    ovCard.style.transition = 'transform .5s cubic-bezier(.6,0,.2,1), opacity .2s .3s';
     ovCard.style.transform = cellTransform(i);
     ovCard.style.opacity = '0';
     clearTimeout(dockTimer);
-    dockTimer = setTimeout(function () { overlay.classList.remove('show'); }, 480);
+    dockTimer = setTimeout(function () { overlay.classList.remove('show'); }, 520);
   }
   function setOpen(i, v) {
     var u = umbs[i];
@@ -1665,10 +1726,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
       setOpen(i, false);
     } else {
       setOpen(i, true);
-      if (overlayMode()) {
-        if (featured > -1) dock();
-        feature(i);
-      }
+      if (overlayMode()) { if (featured > -1) dock(); feature(i); }
     }
   }
   umbs.forEach(function (u, i) { u.btn.addEventListener('click', function () { toggleUmbrella(i); }); });
@@ -1679,10 +1737,7 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
     var r = umbs[featured].btn.getBoundingClientRect();
     if (r.bottom < 0 || r.top > window.innerHeight) dock();
   }, { passive: true });
-  window.addEventListener('resize', function () {
-    syncMode();
-    if (featured > -1) dock();
-  });
+  window.addEventListener('resize', function () { syncMode(); if (featured > -1) dock(); });
 
   /* ---------------- Global: outside taps and keys ---------------- */
   document.addEventListener('click', function (e) {
@@ -1703,15 +1758,6 @@ html.js .outro.in-view .confetti li { opacity: 1; transform: none; }
       setTimeout(function () { k.classList.remove('pressed'); }, 140);
       play(+e.key - 1);
     }
-  });
-
-  /* ---------------- Outro confetti in the umbrella colours ---------------- */
-  var conf = $('#confetti');
-  COLORS.forEach(function (c, i) {
-    var li = document.createElement('li');
-    li.style.setProperty('--c', c);
-    li.style.setProperty('--i', i);
-    conf.appendChild(li);
   });
 })();
 </script>

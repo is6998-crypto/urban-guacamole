@@ -1,0 +1,25 @@
+{
+  "name": "konkursi",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Konkursi: 4-minute 2D animated short for Anti-Corruption Week, built with Remotion",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "fonttest": "remotion still src/index.ts FontTest out/fonttest.png",
+    "stills": "node scripts/stills.mjs",
+    "render": "remotion render src/index.ts Konkursi out/konkursi.mp4 --codec=h264",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.536",
+    "@remotion/google-fonts": "4.0.536",
+    "@remotion/media-utils": "4.0.536",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.536"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}
